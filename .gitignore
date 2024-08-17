@@ -1,4 +1,5 @@
-/weater_data.sh
 /data/weather_data.csv
 /data/weather_data.zip
 .env
+**/weather_data.csv
+./weather_data.zip

@@ -72,7 +72,7 @@ func main() {
 	for i := 1; i <= rows; i++ {
 		station := stations[rand.Intn(len(stations))] // Randomly select a station
 		temperature := generateTemperature() 		// Generate a random temperature
-		batch = append(batch, fmt.Sprintf("%s;%.1f", station, temperature)) // Append the data to the batch
+		batch = append(batch, fmt.Sprintf("%s;%.1f\n", station, temperature)) // Append the data to the batch
 
 		// If the batch is full, write it to the file
 		if i%batchSize == 0 { // Write the batch to the file
@@ -84,13 +84,12 @@ func main() {
 
 	// Write any remaining data
 	if len(batch) > 0 {
-		// ./generate_weater_data.go:78:36: cannot use batch (variable of type []string) as type []any in argument to fmt.Sprintln
 		output.WriteString(fmt.Sprintln(batch...))
-
 	}
 
 	elapsedTime := time.Since(startTime) // Calculate the time taken
 	fmt.Printf("Weather data generation complete. File saved as %s.\n", outputFile)
 	fmt.Printf("Time taken: %s seconds.\n", elapsedTime.Seconds())
+
 	
 }
