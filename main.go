@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"onBillion/config"
+	"time"
 	"strings"
 	"os"
 	"strconv"
@@ -32,7 +33,7 @@ func main() {
 	measurements := make(map[string]*Measurement)
 	
 	// file scanning logic
-	fileScanner := bufio.NewScanner(dataFile) 
+	fileScanner := bufio.NewScanner(dataFile)
 	fileScanner.Split(bufio.ScanLines)
 
 	// size of the file
@@ -40,9 +41,24 @@ func main() {
 	fileSize := fileInfo.Size()
 	fmt.Println("File size: ", fileSize)
 
+	// number of lines in the file
+	lineCount := 0
+	for fileScanner.Scan() {
+		lineCount++
+	}
+	fmt.Println("Number of lines: ", lineCount) // number of lines in the file is 0, because the file has been read to the end of the file
+
+
+	// reset the file scanner
+	dataFile.Seek(0, 0)
+
+	fileScanner = bufio.NewScanner(dataFile)
+	fileScanner.Split(bufio.ScanLines)
+
+	// start a timer to measure the time taken to process the file
+	start := time.Now()
 	// read the file line by line
 	for fileScanner.Scan() {
-		fmt.Println("Scanning line")
 		line := fileScanner.Text()
 
 		parts := strings.Split(line, ";")
@@ -78,6 +94,9 @@ func main() {
 			measurement.Count++
 		}
 	}
+	// stop the timer
+	elapsed := time.Since(start)
+	fmt.Println("Time taken: ", elapsed)
 
 	outputParsing(measurements)
 }
