@@ -16,7 +16,6 @@
 - [The Solution](#the-solution)
 - [The Data](#the-data)
 
-
 ## Introduction
 
 As Jockie Stewart once said, "You don't have to be an engineer to be a racing driver, but you do have to have mechanical sympathy." This project focuses on the parsing of a CSV file containing one billion rows of data. It's not just about writing code that works; it's about designing software that respects the hardware and the necessity of scale.
@@ -43,13 +42,50 @@ You need to parse the file into a list where each row represents a station with 
 
 ## Hardware Constraints
 
+Here are the hardware constraints for this project:
+
+| Hardware Component | Constraint |
+|--------------------|------------|
+| CPU                | 8          |
+| RAM                | 32GB       |
+| Storage            | 1TB SSD    |
+| Architecture       | x86_64     |
+| Goroutines         | 1          |
+| GoMaxProcs         | 8          |
+
 ## Software Constraints
+
+Here are the software constraints for this project:
+
+| Software Component | Constraint    |
+|--------------------|---------------|
+| Go Version         | 1.22.5        |
+| Go Arch            | amd64         |
+| File System        | ext4          |
+| Operating System   | Linux         |
+| Number of Files    | 1             |
+| File Size          | 16GeGa        |
+| File Format        | CSV           |
+| File Columns       | 2             |
+| File Rows          | 1,000,010,000 |
+| File Encoding      | UTF-8         |
+| File Delimiter     | `;`           |
+| File Compression   | None          |
+| File Line Ending   | `\n`          |
 
 ## Software Input
 
 ### File Data
 
 ### Environment Variables Configuration
+
+## How to Run the Project
+
+### Prerequisites
+
+### Environment Variables
+
+### Running the Project
 
 ## Criteria for Success
 
