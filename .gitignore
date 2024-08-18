@@ -3,3 +3,5 @@
 .env
 **/weather_data.csv
 ./weather_data.zip
+
+/data/output.csv
