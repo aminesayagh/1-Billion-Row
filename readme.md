@@ -9,6 +9,10 @@
 - [The Problem Statement](#the-problem-statement)
 - [Hardware Constraints](#hardware-constraints)
 - [Software Constraints](#software-constraints)
+- [Software Input](#software-input)
+  - [File Data](#file-data)
+  - [Environment Variables Configuration](#environment-variables-configuration)
+- [Criteria for Success](#criteria-for-success)
 - [The Solution](#the-solution)
 - [The Data](#the-data)
 
@@ -34,12 +38,20 @@ The problem is straightforward: you have a CSV file with one billion rows, and y
 You need to parse the file into a list where each row represents a station with its minimum temperature, maximum temperature, and average temperature. The list should be sorted by the station name and have the following format:
 
 ```
-<station_name:string>;<min_temperature:float>;<max_temperature:float>;<avg_temperature:float>
+<station_name:string>;<min_temperature:float>;<max_temperature:float>;<medium_temperature:float>;<count_station:int>
 ```
 
 ## Hardware Constraints
 
 ## Software Constraints
+
+## Software Input
+
+### File Data
+
+### Environment Variables Configuration
+
+## Criteria for Success
 
 ## The Solution
 

@@ -1,4 +1,4 @@
-package main
+package version_1_simple
 
 
 import (
@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"fmt"
-	"runtime"
 )
 
 type Measurement struct {
@@ -50,11 +49,6 @@ func main() {
 	}
 	fmt.Println("Number of lines: ", lineCount) // number of lines in the file is 0, because the file has been read to the end of the file
 
-	// print some information about the machine running the program
-	fmt.Println("Number of CPUs: ", runtime.NumCPU())
-	fmt.Println("Number of Goroutines: ", runtime.NumGoroutine())
-	fmt.Println("Number of GoMaxProcs: ", runtime.GOMAXPROCS(0))
-	
 
 	// reset the file scanner
 	dataFile.Seek(0, 0)

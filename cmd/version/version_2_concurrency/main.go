@@ -1,15 +1,11 @@
-package main
-
+package version_2_concurrency
 
 import (
 	"bufio"
-	"onBillion/config"
-	"time"
-	"strings"
-	"os"
-	"strconv"
 	"fmt"
-	"runtime"
+	"onBillion/config"
+	"os"
+	"time"
 )
 
 type Measurement struct {
@@ -33,7 +29,7 @@ func main() {
 	defer dataFile.Close()
 
 	measurements := make(map[string]*Measurement)
-	
+
 	// file scanning logic
 	fileScanner := bufio.NewScanner(dataFile)
 	fileScanner.Split(bufio.ScanLines)
@@ -50,12 +46,6 @@ func main() {
 	}
 	fmt.Println("Number of lines: ", lineCount) // number of lines in the file is 0, because the file has been read to the end of the file
 
-	// print some information about the machine running the program
-	fmt.Println("Number of CPUs: ", runtime.NumCPU())
-	fmt.Println("Number of Goroutines: ", runtime.NumGoroutine())
-	fmt.Println("Number of GoMaxProcs: ", runtime.GOMAXPROCS(0))
-	
-
 	// reset the file scanner
 	dataFile.Seek(0, 0)
 
@@ -64,43 +54,17 @@ func main() {
 
 	// start a timer to measure the time taken to process the file
 	start := time.Now()
-	// read the file line by line
+
+	chunkNumber := config.ChunkSize
+	chunk := make(chan [string]*Measurement, chunkNumber)
+
 	for fileScanner.Scan() {
 		line := fileScanner.Text()
-
-		parts := strings.Split(line, ";")
-		if len(parts) < 2 {
-			continue
-		}
-		station := parts[0]
-
-		temperature, err := strconv.ParseFloat(parts[1], 64)
-		if err != nil {
-			fmt.Println("Error parsing temperature: ", err)
-			continue
-		}
-		
-		measurement, exists := measurements[station]
-
-		if !exists {
-			measurement = &Measurement{
-				Min:    temperature,
-				Max:    temperature,
-				Median: temperature,
-				Count:  1,
-			}
-			measurements[station] = measurement
-		} else {
-			if temperature < measurement.Min {
-				measurement.Min = temperature
-			}
-			if temperature > measurement.Max {
-				measurement.Max = temperature
-			}
-			measurement.Median = (measurement.Median + temperature) / 2
-			measurement.Count++
+		chunk = append(chunk, line)
+		if len(chunk) == chunkNumber {
 		}
 	}
+
 	// stop the timer
 	elapsed := time.Since(start)
 	fmt.Println("Time taken: ", elapsed)
