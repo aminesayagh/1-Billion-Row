@@ -13,6 +13,7 @@ type Config struct {
 	LogLevel        string // Log level
 	MaxWorkers      int    // Number of workers to use
 	ChunkSize       int    // Number of rows to process in each chunk
+	NumberOfLines   int    // Number of lines in the input file
 }
 
 func New() *Config {
@@ -23,6 +24,7 @@ func New() *Config {
 		LogLevel:        getEnv("LOG_LEVEL", "info"),
 		MaxWorkers:      getEnvAsInt("MAX_WORKERS", 10),
 		ChunkSize:       getEnvAsInt("CHUNK_SIZE", 1000),
+		NumberOfLines:   getEnvAsInt("NUMBER_OF_LINES", 0),
 	}
 } // New: Create a new Config instance with default values for the configuration options
 

@@ -9,12 +9,20 @@
 - [The Problem Statement](#the-problem-statement)
 - [Hardware Constraints](#hardware-constraints)
 - [Software Constraints](#software-constraints)
-- [Software Input](#software-input)
-  - [File Data](#file-data)
-  - [Environment Variables Configuration](#environment-variables-configuration)
+- [Configuration](#configuration)
+- [How to Run the Project](#how-to-run-the-project)
+  - [Prerequisites](#prerequisites)
+  - [Environment Variables](#environment-variables)
+  - [Running the Project](#running-the-project)
 - [Criteria for Success](#criteria-for-success)
 - [The Solution](#the-solution)
-- [The Data](#the-data)
+  - [Stage 1: Simple Parsing Solution](#stage-1-simple-parsing-solution)
+    - [Process](#process)
+    - [Points considered](#points-considered)
+    - [Results](#results)
+- [Resume](#resume)
+- [References](#references)
+- [License](#license)
 
 ## Introduction
 
@@ -73,11 +81,15 @@ Here are the software constraints for this project:
 | File Compression   | None          |
 | File Line Ending   | `\n`          |
 
-## Software Input
+## Configuration
 
-### File Data
+we use the following environment variables to configure the software:
 
-### Environment Variables Configuration
+- `INPUT_FILE_PATH`: The path to the input data csv file to parse.
+- `OUTPUT_FILE_PATH`: The path to the output data csv file to write the parsed data.
+- `METRICS_FILE_PATH`: The path to the metrics data csv file to write the metrics data.
+- `MAX_WORKERS`: The maximum number of workers to use for parsing the data.
+- `CHUNK_SIZE`: The size of the chunk to read from the input file.
 
 ## How to Run the Project
 
@@ -85,10 +97,96 @@ Here are the software constraints for this project:
 
 ### Environment Variables
 
+The project uses environment variables to configure the software. You can set the environment variables in a `.env` file in the root directory of the project. Here is an example of the `.env` file:
+
+```bash
+INPUT_FILE_PATH = './data/weather_data.csv'
+OUTPUT_FILE_PATH = './data/output.csv'
+METRICS_FILE_PATH = 'data/metrics.log'
+LOG_LEVEL = 'INFO'
+MAX_WORKERS = 10
+CHUNK_SIZE = 1000
+```
+
 ### Running the Project
+
+To run the project, their is a bash script `update_and_run.sh` that you can use on a Linux machine. The script update the go version to 1.22.5, update the go modules,
+export the environment variables, and run the project.
+
+```bash
+chmod +x update_and_run.sh
+./update_and_run.sh
+```
+
+## Measurements and Metrics
+
+The project will measure the following metrics:
+
+- Execution time: The time taken to parse the input data file. max 10 minutes before the project is considered a failure.
+- Memory usage: The amount of memory used by the software. max 24GB before the project is considered a failure.
+
+To measure these metrics, we implemented the function `measure` that will write the metrics to a file, stop the process if any of the metrics exceed the constraints, and print the metrics to the console.
+
+```go
+func tracker(f func()) {
+ done := make(chan bool)
+
+ go func() {
+  memory(func() {
+   timer(f)
+   done <- true
+  })
+ }()
+
+ select {
+ case <-done:
+  fmt.Println("Function execution completed.")
+ case <-time.After(10 * time.Minute):
+  fmt.Println("Function execution timed out.")
+ }
+}
+```
 
 ## Criteria for Success
 
+The project will be considered successful if it meets the following criteria:
+
+- The software parses the input data file correctly.
+- The software writes the output data file correctly.
+- The software respects the hardware constraints.
+- The software respects the software constraints.
+- The software is well-documented.
+
 ## The Solution
 
-## The Data
+To achieve the best performance, we separate the stages of the development of our parsing solution on the following steps (separate branches `<stage_{number}_{title}>`):
+
+### Stage 1: Simple Parsing Solution
+
+In this stage, the parsing solution is a simple one threaded solution, we took on consideration this following points to achieve the best performance:
+
+#### Process
+
+1. Read the input file in chunks.
+2. Parse the data in each chunk.
+3. Store the parsed data in memory (in a map).
+4. Write the output data to a file.
+
+#### Points considered
+
+- Use of pointers to avoid copying data.
+- Use of the `bufio` package to read the file in chunks, streamlining the reading process, reducing I/O operations.
+- (X) Use of the `sort` package to sort the data by station name.
+
+#### Results
+
+- Execution time: 4m3.715171264s.
+- Total memory Allocated: 48453.51MB.
+- System memory used: 13.81MB.
+- Heap memory used: 2.88MB.
+
+## Resume
+
+## References
+
+## License
