@@ -55,5 +55,8 @@ echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.profile
 # Verify the installation
 go version
 
+# Update the Go modules
+go mod tidy
+
 # Run the main.go file
 go run main.go
