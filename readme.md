@@ -104,6 +104,8 @@ METRICS_FILE_PATH = 'data/metrics.log'
 LOG_LEVEL = 'INFO'
 MAX_WORKERS = 10
 CHUNK_SIZE = 1000
+VERSION = '1.0.0'
+NUMBER_OF_ROWS = 1000000000
 ```
 
 ### Running the Project

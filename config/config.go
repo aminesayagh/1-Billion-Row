@@ -25,7 +25,7 @@ func New() *Config {
 		LogLevel:        getEnv("LOG_LEVEL", "info"),
 		MaxWorkers:      getEnvAsInt("MAX_WORKERS", 10),
 		ChunkSize:       getEnvAsInt("CHUNK_SIZE", 1000),
-		NumberOfLines:   getEnvAsInt("NUMBER_OF_LINES", 0),
+		NumberOfLines:   getEnvAsInt("NUMBER_OF_ROWS", 0),
 		Version:         getEnv("VERSION", "1.0.0"),
 	}
 } // New: Create a new Config instance with default values for the configuration options
