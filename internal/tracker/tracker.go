@@ -1,13 +1,11 @@
 package tracker
 
 import (
-	"bufio"
 	"fmt"
+	"onBillion/config"
 	"os"
 	"runtime"
-	"strings"
 	"time"
-	"onBillion/config"
 )
 
 type MetricsMap map[string]string
@@ -28,7 +26,7 @@ func timer(f func(), metrics chan MetricsMap) {
 
 func memory(f func(), metrics chan MetricsMap) {
 	// Trigger garbage collection to minimize impact of stale allocations
-    runtime.GC()
+	runtime.GC()
 
 	// Memory statistics before executing the function
 	var memBefore runtime.MemStats
@@ -48,10 +46,10 @@ func memory(f func(), metrics chan MetricsMap) {
 
 	// Send memory metrics to the metrics channel
 	metrics <- map[string]string{
-		"Alloc Memory":      fmt.Sprintf("%.2f MB", allocMemory),
+		"Alloc Memory":       fmt.Sprintf("%.2f MB", allocMemory),
 		"Total Alloc Memory": fmt.Sprintf("%.2f MB", totalAllocMemory),
-		"Sys Memory":        fmt.Sprintf("%.2f MB", sysMemory),
-		"Heap Memory":       fmt.Sprintf("%.2f MB", heapMemory),
+		"Sys Memory":         fmt.Sprintf("%.2f MB", sysMemory),
+		"Heap Memory":        fmt.Sprintf("%.2f MB", heapMemory),
 	}
 }
 
@@ -84,7 +82,7 @@ func Run(f func()) {
 				fmt.Printf("--- Metrics %s: %s\n", k, v)
 				aggregatedMetrics[k] = v
 			}
-	
+
 		case <-time.After(10 * time.Minute):
 			fmt.Println("Function execution timed out.")
 			saveMetrics(metricsOutputFilePath, version, aggregatedMetrics)
@@ -107,10 +105,6 @@ func saveMetrics(metricsOutputFilePath string, version string, metrics MetricsMa
 	// save the metrics to the file in the format: date-version-key=value
 	date := time.Now().Format("2006-01-02")
 	for key, value := range metrics {
-		if hasMetric, _ := searchMetric(metricsOutputFilePath, version, key); hasMetric != 0 {
-			// remove the line from original file
-			removeMetric(metricsOutputFilePath, hasMetric)
-		}
 		_, _ = tempFile.WriteString(fmt.Sprintf("%s-%s-%s=%s\n", date, version, key, value))
 	}
 
@@ -119,62 +113,5 @@ func saveMetrics(metricsOutputFilePath string, version string, metrics MetricsMa
 		fmt.Println("Error renaming temporary metrics file: ", err)
 	} else {
 		fmt.Println("Metrics saved to file: ", metricsOutputFilePath)
-	}
-}
-
-func searchMetric(metricsOutputFilePath, version, key string) (int, string) {
-	metricsOutputFile, err := os.Open(metricsOutputFilePath)
-	if err != nil {
-		fmt.Println("Error opening metrics file: ", err)
-		return 0, ""
-	}
-	defer metricsOutputFile.Close()
-
-	scanner := bufio.NewScanner(metricsOutputFile)
-	currentLine := 0
-
-	for scanner.Scan() {
-		currentLine++
-		line := scanner.Text()
-		parts := strings.Split(line, "-")
-		if len(parts) < 3 {
-			continue
-		}
-		if parts[1] == version && strings.Contains(parts[2], key) {
-			return currentLine, line
-		}
-	}
-	return 0, ""
-}
-
-func removeMetric(metricsOutputFilePath string, line int) {
-	metricsOutputFile, err := os.Open(metricsOutputFilePath)
-	if err != nil {
-		fmt.Println("Error opening metrics file: ", err)
-		return
-	}
-	defer metricsOutputFile.Close()
-
-	tempFilePath := metricsOutputFilePath + ".tmp"
-	tempFile, err := os.Create(tempFilePath)
-	if err != nil {
-		fmt.Println("Error creating temporary file: ", err)
-		return
-	}
-	defer tempFile.Close()
-
-	scanner := bufio.NewScanner(metricsOutputFile)
-	currentLine := 0
-
-	for scanner.Scan() {
-		currentLine++
-		if currentLine == line {
-			continue
-		}
-		_, _ = tempFile.WriteString(scanner.Text() + "\n")
-	}
-
-	if err := os.Rename(tempFilePath, metricsOutputFilePath); err != nil {
-		fmt.Println("Error renaming temporary file: ", err)
 	}
 }

@@ -226,7 +226,9 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 
 - Use of pointers to avoid copying data.
 - Use of the `bufio` package to read the file in chunks, streamlining the reading process, reducing I/O operations.
-- (X) Use of the `sort` package to sort the data by station name.
+- Use `strings.Index` Instead of `strings.Split` to avoid memory allocation.
+- Use maps to store the parsed data, with a size of 100,000 records, referencing the estimated number of stations in the data.
+- Increase the Buffer size for the `bufio.Scanner` to 64 * 1024 bytes.
 
 #### Results
 
@@ -238,12 +240,13 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 
 ## Resume
 
-| Stage                   | Execution Time | Memory Allocated |
-|-------------------------|----------------|------------------|
-| Stage 1: Simple Parsing | 3m47.228s      | 1.01 MB          |
+| Stage                   | Execution Time | Total Memory Allocated |
+|-------------------------|----------------|------------------------|
+| Stage 1: Simple Parsing | 2m16.50785728s | 17939.17 MB            |
 
 ## References
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
