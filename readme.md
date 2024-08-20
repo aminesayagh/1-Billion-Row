@@ -38,14 +38,12 @@ This scale is often required by large companies like Google, which has 1.2 billi
 
 The problem is straightforward: you have a CSV file with one billion rows, and your task is to parse it. The CSV file follows the format:
 
-```
-<station_name:string>;<temperature:float>
+``` <station_name:string>;<temperature:float>
 ```
 
 You need to parse the file into a list where each row represents a station with its minimum temperature, maximum temperature, and average temperature. The list should be sorted by the station name and have the following format:
 
-```
-<station_name:string>;<min_temperature:float>;<max_temperature:float>;<medium_temperature:float>;<count_station:int>
+``` <station_name:string>;<min_temperature:float>;<max_temperature:float>;<medium_temperature:float>;<count_station:int>
 ```
 
 ## Hardware Constraints
@@ -180,10 +178,11 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 
 #### Results
 
-- Execution time: 4m3.715171264s.
-- Total memory Allocated: 48453.51MB.
-- System memory used: 13.81MB.
-- Heap memory used: 2.88MB.
+- Execution time: 3m47.796137077s.
+- Allocated memory: 0.87 MB.
+- Total memory Allocated: 48453.53 MB.
+- System memory used: 13.88 MB.
+- Heap memory used: 0.87 MB.
 
 ## Resume
 
