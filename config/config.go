@@ -14,6 +14,7 @@ type Config struct {
 	MaxWorkers      int    // Number of workers to use
 	ChunkSize       int    // Number of rows to process in each chunk
 	NumberOfLines   int    // Number of lines in the input file
+	Version         string // Version of the application
 }
 
 func New() *Config {
@@ -25,6 +26,7 @@ func New() *Config {
 		MaxWorkers:      getEnvAsInt("MAX_WORKERS", 10),
 		ChunkSize:       getEnvAsInt("CHUNK_SIZE", 1000),
 		NumberOfLines:   getEnvAsInt("NUMBER_OF_LINES", 0),
+		Version:         getEnv("VERSION", "1.0.0"),
 	}
 } // New: Create a new Config instance with default values for the configuration options
 
