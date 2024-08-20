@@ -2,21 +2,33 @@ package tracker
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"os"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
-
 	"onBillion/config"
 )
 
 type MetricsMap map[string]string
 
-func trackMetrics(ctx context.Context, f func(), metrics chan MetricsMap) {
+func timer(f func(), metrics chan MetricsMap) {
+	// start the timer
 	start := time.Now()
+	f()
+
+	// end the timer
+	end := time.Now()
+	diff := end.Sub(start)
+
+	metrics <- MetricsMap{
+		"Execution Time": diff.String(),
+	}
+}
+
+func memory(f func(), metrics chan MetricsMap) {
+	// Trigger garbage collection to minimize impact of stale allocations
+    runtime.GC()
 
 	// Memory statistics before executing the function
 	var memBefore runtime.MemStats
@@ -34,61 +46,52 @@ func trackMetrics(ctx context.Context, f func(), metrics chan MetricsMap) {
 	sysMemory := float64(memAfter.Sys-memBefore.Sys) / 1024 / 1024
 	heapMemory := float64(memAfter.HeapAlloc-memBefore.HeapAlloc) / 1024 / 1024
 
-	// End the timer
-	end := time.Now()
-	diff := end.Sub(start)
-
-	// Send all metrics to the metrics channel
+	// Send memory metrics to the metrics channel
 	metrics <- map[string]string{
-		"ExecutionTime":    diff.String(),
-		"AllocMemory":      fmt.Sprintf("%.2f MB", allocMemory),
-		"TotalAllocMemory": fmt.Sprintf("%.2f MB", totalAllocMemory),
-		"SysMemory":        fmt.Sprintf("%.2f MB", sysMemory),
-		"HeapMemory":       fmt.Sprintf("%.2f MB", heapMemory),
-		// add more metrics here
-	}
-
-	// Optionally, you can monitor the context for cancellation or timeout
-	select {
-	case <-ctx.Done():
-		fmt.Println("Function execution was cancelled or timed out.")
-	default:
-		// continue normally
+		"Alloc Memory":      fmt.Sprintf("%.2f MB", allocMemory),
+		"Total Alloc Memory": fmt.Sprintf("%.2f MB", totalAllocMemory),
+		"Sys Memory":        fmt.Sprintf("%.2f MB", sysMemory),
+		"Heap Memory":       fmt.Sprintf("%.2f MB", heapMemory),
 	}
 }
 
 func Run(f func()) {
-	var wg sync.WaitGroup
+	done := make(chan bool)
 	metrics := make(chan MetricsMap)
 	aggregatedMetrics := make(MetricsMap)
 
 	conf := config.GetInstance()
+
 	version := conf.Version
 	metricsOutputFilePath := conf.MetricsFilePath
 
-	// Use a context with timeout to manage function execution time
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
-	defer cancel()
-
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
-		trackMetrics(ctx, f, metrics)
+		memory(func() {
+			timer(f, metrics)
+		}, metrics)
+
+		done <- true
 	}()
 
-	go func() {
-		for m := range metrics {
+	for {
+		select {
+		case <-done:
+			fmt.Println("Function execution completed.")
+			saveMetrics(metricsOutputFilePath, version, aggregatedMetrics)
+			return
+		case m := <-metrics:
 			for k, v := range m {
-				fmt.Printf("%s: %s\n", k, v)
+				fmt.Printf("--- Metrics %s: %s\n", k, v)
 				aggregatedMetrics[k] = v
 			}
+	
+		case <-time.After(10 * time.Minute):
+			fmt.Println("Function execution timed out.")
+			saveMetrics(metricsOutputFilePath, version, aggregatedMetrics)
+			done <- true
+			return
 		}
-	}()
-
-	wg.Wait()
-	close(metrics)
-	saveMetrics(metricsOutputFilePath, version, aggregatedMetrics)
-	fmt.Println("Function execution completed.")
+	}
 }
 
 func saveMetrics(metricsOutputFilePath string, version string, metrics MetricsMap) {

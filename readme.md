@@ -11,7 +11,7 @@
 - [Software Constraints](#software-constraints)
 - [Configuration](#configuration)
 - [How to Run the Project](#how-to-run-the-project)
-  - [Prerequisites](#prerequisites)
+  - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
   - [Running the Project](#running-the-project)
 - [Criteria for Success](#criteria-for-success)
@@ -91,7 +91,39 @@ we use the following environment variables to configure the software:
 
 ## How to Run the Project
 
-### Prerequisites
+### Directory Structure
+
+The project has the following directory structure:
+
+```bash
+.
+├── cmd
+│   ├── faker
+│   │   └── main.go
+│   └── version
+│       └── version_1_simple
+│           └── main.go
+├── config
+│   └── config.go
+├── data
+│   ├── metrics.log
+│   ├── output.csv
+│   ├── weather_data.csv
+├── go.mod
+├── go.sum
+├── internal
+│   ├── context
+│   │   └── context.go
+│   ├── logger
+│   │   ├── logger.go
+│   │   └── logger_test.go
+│   └── tracker
+│       └── tracker.go
+├── main.go
+├── readme.md
+└── scripts
+    ├── update_and_run.sh
+```
 
 ### Environment Variables
 
@@ -114,8 +146,8 @@ To run the project, their is a bash script `update_and_run.sh` that you can use 
 export the environment variables, and run the project.
 
 ```bash
-chmod +x update_and_run.sh
-./update_and_run.sh
+chmod +x ./scripts/update_and_run.sh
+./scripts/update_and_run.sh
 ```
 
 ## Measurements and Metrics
@@ -130,22 +162,40 @@ To measure these metrics, we implemented the function `measure` that will write 
 ```go
 func tracker(f func()) {
  done := make(chan bool)
+ metrics := make(chan MetricsMap)
+ aggregatedMetrics := make(MetricsMap)
+
+ conf := config.GetInstance()
+
+ version := conf.Version
+ metricsOutputFilePath := conf.MetricsFilePath
 
  go func() {
   memory(func() {
-   timer(f)
-   done <- true
-  })
+   timer(f, metrics)
+  }, metrics)
+
+  done <- true
  }()
 
  select {
  case <-done:
   fmt.Println("Function execution completed.")
+  saveMetrics(metricsOutputFilePath, version, aggregatedMetrics)
+  return
+ case m := <-metrics:
+  for k, v := range m {
+   fmt.Printf("%s: %s\n", k, v)
+   aggregatedMetrics[k] = v
+  }
+
  case <-time.After(10 * time.Minute):
   fmt.Println("Function execution timed out.")
  }
 }
 ```
+
+Check the [`tracker` function](https://github.com/aminesayagh/1-Billion-row/blob/stage_1_simple_implementation/internal/tracker/tracker.go) in the directory `internal/tracker/tracker.go` for more details.
 
 ## Criteria for Success
 
@@ -180,14 +230,20 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 
 #### Results
 
-- Execution time: 3m47.796137077s.
-- Allocated memory: 0.87 MB.
-- Total memory Allocated: 48453.53 MB.
-- System memory used: 13.88 MB.
-- Heap memory used: 0.87 MB.
+- Execution time: 3m47.228691981s.
+- Allocated memory: 1.01 MB.
+- Total memory Allocated: 48453.47 MB.
+- System memory used: 13.31 MB.
+- Heap memory used: 1.01 MB.
 
 ## Resume
+
+| Stage                   | Execution Time | Memory Allocated |
+|-------------------------|----------------|------------------|
+| Stage 1: Simple Parsing | 3m47.228s      | 1.01 MB          |
 
 ## References
 
 ## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

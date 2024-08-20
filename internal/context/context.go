@@ -46,7 +46,7 @@ func SoftwareContext(file *os.File, config *config.Config) {
 	fmt.Println("File size: ", fileSize)
 
 	// number of lines in the file
-	lineCount := 1000010000
+	lineCount := config.NumberOfRows
 	if lineCount == 0 {
 		fileScanner := bufio.NewScanner(file)
 		for fileScanner.Scan() {

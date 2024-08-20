@@ -52,8 +52,7 @@ export PATH=/usr/local/go/bin:$PATH
 # Add the PATH update to the shell profile for future sessions
 echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.profile
 
-# use ../.env file to server the environment variables for the project
-source ../.env
+# Include the environment variable from .env in the current session 
 
 # Verify the installation
 go version
