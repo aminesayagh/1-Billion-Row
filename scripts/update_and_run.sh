@@ -52,11 +52,16 @@ export PATH=/usr/local/go/bin:$PATH
 # Add the PATH update to the shell profile for future sessions
 echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.profile
 
+# Include the environment variable from .env in the current session 
+
 # Verify the installation
 go version
 
 # Update the Go modules
 go mod tidy
+
+# Install the Go packages
+go install
 
 # Run the main.go file
 go run main.go

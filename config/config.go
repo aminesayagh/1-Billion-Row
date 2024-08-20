@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -13,10 +14,14 @@ type Config struct {
 	LogLevel        string // Log level
 	MaxWorkers      int    // Number of workers to use
 	ChunkSize       int    // Number of rows to process in each chunk
-	NumberOfLines   int    // Number of lines in the input file
+	NumberOfRows   int    // Number of lines in the input file
+	Version         string // Version of the application
 }
 
 func New() *Config {
+	_ = godotenv.Load()
+
+
 	return &Config{
 		InputFilePath:   getEnv("INPUT_FILE_PATH", "data/weather_data.csv"),
 		OutputFilePath:  getEnv("OUTPUT_FILE_PATH", "data/output.csv"),
@@ -24,7 +29,8 @@ func New() *Config {
 		LogLevel:        getEnv("LOG_LEVEL", "info"),
 		MaxWorkers:      getEnvAsInt("MAX_WORKERS", 10),
 		ChunkSize:       getEnvAsInt("CHUNK_SIZE", 1000),
-		NumberOfLines:   getEnvAsInt("NUMBER_OF_LINES", 0),
+		NumberOfRows:   getEnvAsInt("NUMBER_OF_ROWS", 0),
+		Version:         getEnv("VERSION", "1.0.0"),
 	}
 } // New: Create a new Config instance with default values for the configuration options
 

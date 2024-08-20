@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
-        "alloc"
+        "alloc",
+        "bufio",
+        "Goroutines",
+        "Println",
+        "Procs"
     ]
 }
