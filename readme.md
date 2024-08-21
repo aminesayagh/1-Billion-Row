@@ -234,17 +234,17 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 
 #### Results
 
-- Execution time: 3m47.228691981s.
-- Allocated memory: 1.01 MB.
-- Total memory Allocated: 48453.47 MB.
+- Execution time: 2m19.292442845s.
+- Allocated memory: 4.07 MB.
+- Total memory Allocated: 17939.17 MB.
 - System memory used: 13.31 MB.
-- Heap memory used: 1.01 MB.
+- Heap memory used: 4.07 MB.
 
 ## Resume
 
-| Stage                   | Execution Time | Total Memory Allocated |
-|-------------------------|----------------|------------------------|
-| Stage 1: Simple Parsing | 2m16.50785728s | 17939.17 MB            |
+| Stage                   | Execution Time    | Total Memory Allocated |
+|-------------------------|-------------------|------------------------|
+| Stage 1: Simple Parsing | 2m19.292442845s   | 17939.17 MB            |
 
 ## References
 
