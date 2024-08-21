@@ -38,12 +38,14 @@ This scale is often required by large companies like Google, which has 1.2 billi
 
 The problem is straightforward: you have a CSV file with one billion rows, and your task is to parse it. The CSV file follows the format:
 
-``` <station_name:string>;<temperature:float>
+```html
+<station_name:string>;<temperature:float>
 ```
 
 You need to parse the file into a list where each row represents a station with its minimum temperature, maximum temperature, and average temperature. The list should be sorted by the station name and have the following format:
 
-``` <station_name:string>;<min_temperature:float>;<max_temperature:float>;<medium_temperature:float>;<count_station:int>
+```html
+<station_name:string>;<min_temperature:float>;<max_temperature:float>;<medium_temperature:float>;<count_station:int>
 ```
 
 ## Hardware Constraints
@@ -232,21 +234,20 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 
 #### Results
 
-- Execution time: 3m47.228691981s.
-- Allocated memory: 1.01 MB.
-- Total memory Allocated: 48453.47 MB.
+- Execution time: 2m19.292442845s.
+- Allocated memory: 4.07 MB.
+- Total memory Allocated: 17939.17 MB.
 - System memory used: 13.31 MB.
-- Heap memory used: 1.01 MB.
+- Heap memory used: 4.07 MB.
 
 ## Resume
 
-| Stage                   | Execution Time | Total Memory Allocated |
-|-------------------------|----------------|------------------------|
-| Stage 1: Simple Parsing | 2m16.50785728s | 17939.17 MB            |
+| Stage                   | Execution Time    | Total Memory Allocated |
+|-------------------------|-------------------|------------------------|
+| Stage 1: Simple Parsing | 2m19.292442845s   | 17939.17 MB            |
 
 ## References
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
