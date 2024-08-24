@@ -3,33 +3,19 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"onBillion/internal/tracker"
-	"onBillion/internal/context"
 	"onBillion/config"
+	"onBillion/internal/context"
+	"onBillion/internal/tracker"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type Measurement struct {
-	Min    float64
-	Max    float64
-	Median float64
-	Count  int
-}
-
-func outputParsing(data map[string]*Measurement) {
-	// read the output file
-	dataOutputFile, err := os.Create("data/output.csv")
-	if err != nil {
-		fmt.Println("Error creating output file: ", err)
-		return
-	}
-	defer dataOutputFile.Close()
-
-	for station, measurement := range data {
-		dataOutputFile.WriteString(fmt.Sprintf("%s;%f;%f;%f;%d\n", station, measurement.Min, measurement.Max, measurement.Median, measurement.Count))
-	}
+	Min     float64
+	Max     float64
+	Average float64
+	Count   int
 }
 
 func parsing() {
@@ -46,48 +32,76 @@ func parsing() {
 
 	// file scanning logic
 	fileScanner := bufio.NewScanner(dataFile)
-	fileScanner.Split(bufio.ScanLines)
+	buf := make([]byte, 0, 64*1024)    // 64 KB buffer
+	fileScanner.Buffer(buf, 1024*1024) // Up to 1 MB lines
 
 	// parsing logic
-	measurements := make(map[string]*Measurement)
+	measurements := make(map[string]*Measurement, 100000)
+
+	currentLine := ""
+	currentStation := ""
+	currentTemperature := ""
+	currentSepIndex := -1
+	currentMeasurement := &Measurement{}
+	currentMeasurementExists := false
 
 	for fileScanner.Scan() {
-		line := fileScanner.Text()
+		currentLine = fileScanner.Text()
 
-		parts := strings.Split(line, ";")
-		if len(parts) < 2 {
+		currentSepIndex = strings.Index(currentLine, ";") // split by semicolon without memory allocation
+
+		if currentSepIndex == -1 {
 			continue
 		}
-		station := parts[0]
 
-		temperature, err := strconv.ParseFloat(parts[1], 64)
+		currentStation = currentLine[:currentSepIndex]
+		currentTemperature = currentLine[currentSepIndex+1:]
+
+		parsedTemperature, err := strconv.ParseFloat(currentTemperature, 64)
 		if err != nil {
 			fmt.Println("Error parsing temperature: ", err)
 			continue
 		}
 
-		measurement, exists := measurements[station]
+		currentMeasurement, currentMeasurementExists = measurements[currentStation]
 
-		if !exists {
-			measurement = &Measurement{
-				Min:    temperature,
-				Max:    temperature,
-				Median: temperature,
-				Count:  1,
+		if !currentMeasurementExists {
+			currentMeasurement = &Measurement{
+				Min:     parsedTemperature,
+				Max:     parsedTemperature,
+				Average: parsedTemperature,
+				Count:   1,
 			}
-			measurements[station] = measurement
+			measurements[currentStation] = currentMeasurement
 		} else {
-			if temperature < measurement.Min {
-				measurement.Min = temperature
-			} else if temperature > measurement.Max {
-				measurement.Max = temperature
+			if parsedTemperature < currentMeasurement.Min {
+				currentMeasurement.Min = parsedTemperature
 			}
-			measurement.Median = (measurement.Median + temperature) / 2
-			measurement.Count++
+			if parsedTemperature > currentMeasurement.Max {
+				currentMeasurement.Max = parsedTemperature
+			}
+			currentMeasurement.Count++
+			currentMeasurement.Average = (parsedTemperature - currentMeasurement.Average) / float64(currentMeasurement.Count)
 		}
 	}
 
-	outputParsing(measurements)
+	dataOutputFile, err := os.Create(config.OutputFilePath)
+	if err != nil {
+		fmt.Println("Error creating output file: ", err)
+		return
+	}
+	defer dataOutputFile.Close()
+
+	// Write output efficiently
+	outputBuffer := bufio.NewWriter(dataOutputFile)
+	for station, measurement := range measurements {
+		outputBuffer.WriteString(station + ";" +
+			strconv.FormatFloat(measurement.Min, 'f', 6, 64) + ";" +
+			strconv.FormatFloat(measurement.Max, 'f', 6, 64) + ";" +
+			strconv.FormatFloat(measurement.Average, 'f', 6, 64) + ";" +
+			strconv.Itoa(measurement.Count) + "\n")
+	}
+	outputBuffer.Flush()
 }
 
 func main() {
@@ -117,7 +131,7 @@ func main() {
 	dataFile.Close()
 	// remove the variable
 	dataFile = nil
-	
+
 	// parsing
 	tracker.Run(parsing)
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"time"
+	"sync"
 )
 
 type MetricsMap map[string]string
@@ -93,25 +94,76 @@ func Run(f func()) {
 }
 
 func saveMetrics(metricsOutputFilePath string, version string, metrics MetricsMap) {
-	tempFilePath := metricsOutputFilePath + ".tmp"
-
-	tempFile, err := os.Create(tempFilePath)
+	file, err := os.OpenFile(metricsOutputFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error creating temporary metrics file: ", err)
+		fmt.Println(err)
 		return
 	}
-	defer tempFile.Close()
+	defer file.Close()
 
-	// save the metrics to the file in the format: date-version-key=value
-	date := time.Now().Format("2006-01-02")
-	for key, value := range metrics {
-		_, _ = tempFile.WriteString(fmt.Sprintf("%s-%s-%s=%s\n", date, version, key, value))
+	_, err = file.WriteString(fmt.Sprintf("Version: %s\n", version))
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	// Rename temp file to actual file
-	if err := os.Rename(tempFilePath, metricsOutputFilePath); err != nil {
-		fmt.Println("Error renaming temporary metrics file: ", err)
+	date := time.Now().Format("2006-01-02 15:04:05")
+
+	for k, v := range metrics {
+		_, err = file.WriteString(fmt.Sprintf("%s-%s-%s-%s\n", date, version, k, v))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+}
+
+// MeasureExecutionTime measures the average execution time of two functions and compares them
+func MeasureExecutionTime(f1, f2 func(), iterations int) (time.Duration, time.Duration) {
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	var totalTimeF1, totalTimeF2 time.Duration
+
+	// Run the first function multiple times in a goroutine
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations; i++ {
+			start := time.Now()
+			f1()
+			totalTimeF1 += time.Since(start)
+		}
+	}()
+
+	// Run the second function multiple times in a goroutine
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations; i++ {
+			start := time.Now()
+			f2()
+			totalTimeF2 += time.Since(start)
+		}
+	}()
+
+	// Wait for both goroutines to finish
+	wg.Wait()
+
+	// Calculate average times
+	avgTimeF1 := totalTimeF1 / time.Duration(iterations)
+	avgTimeF2 := totalTimeF2 / time.Duration(iterations)
+
+	// Print the results
+	fmt.Printf("Function 1 average time: %v\n", avgTimeF1)
+	fmt.Printf("Function 2 average time: %v\n", avgTimeF2)
+
+	// Determine which function is slower
+	if avgTimeF1 > avgTimeF2 {
+		fmt.Println("Function 1 is slower.")
+	} else if avgTimeF1 < avgTimeF2 {
+		fmt.Println("Function 2 is slower.")
 	} else {
-		fmt.Println("Metrics saved to file: ", metricsOutputFilePath)
+		fmt.Println("Both functions have the same average execution time.")
 	}
+
+	return avgTimeF1, avgTimeF2
 }

@@ -152,6 +152,7 @@ chmod +x ./scripts/update_and_run.sh
 ./scripts/update_and_run.sh
 ```
 
+
 ## Measurements and Metrics
 
 The project will measure the following metrics:
@@ -199,6 +200,8 @@ func tracker(f func()) {
 
 Check the [`tracker` function](https://github.com/aminesayagh/1-Billion-row/blob/stage_1_simple_implementation/internal/tracker/tracker.go) in the directory `internal/tracker/tracker.go` for more details.
 
+## Helper Functions
+
 ## Criteria for Success
 
 The project will be considered successful if it meets the following criteria:
@@ -232,6 +235,7 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 - Use maps to store the parsed data, with a size of 100,000 records, referencing the estimated number of stations in the data.
 - Increase the Buffer size for the `bufio.Scanner` to 64 * 1024 bytes.
 
+
 #### Results
 
 - Execution time: 2m19.292442845s.
@@ -239,6 +243,15 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 - Total memory Allocated: 17939.17 MB.
 - System memory used: 13.31 MB.
 - Heap memory used: 4.07 MB.
+
+### Stage 2: Byte Parsing Solution
+
+#### Points considered
+
+- Process file on a byte level, to avoid memory allocation.
+- Handle operations of parsing on a byte level, to avoid memory allocation.
+- use a hash (FNV-1a) map key based on the station name, of key sizes of 8 bytes (intended for int32, int64 and pointers), to store the parsed data.
+- (X) - Use [8]byte to store temperature values, to avoid conversion on the parsing operation.
 
 ## Resume
 

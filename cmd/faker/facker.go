@@ -89,7 +89,5 @@ func main() {
 
 	elapsedTime := time.Since(startTime) // Calculate the time taken
 	fmt.Printf("Weather data generation complete. File saved as %s.\n", outputFile)
-	fmt.Printf("Time taken: %s seconds.\n", elapsedTime.Seconds())
-
-	
+	fmt.Printf("Time taken: %f seconds.\n", elapsedTime.Seconds())
 }
