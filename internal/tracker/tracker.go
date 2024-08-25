@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"time"
 	"sync"
+	"sort"
 )
 
 type MetricsMap map[string]string
@@ -119,51 +120,48 @@ func saveMetrics(metricsOutputFilePath string, version string, metrics MetricsMa
 }
 
 // MeasureExecutionTime measures the average execution time of two functions and compares them
-func MeasureExecutionTime(f1, f2 func(), iterations int) (time.Duration, time.Duration) {
+func MeasureExecutionTime(funcs []func(), iterations int) []time.Duration {
+	numFuncs := len(funcs)
+	allTimes := make([][]time.Duration, numFuncs)
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(numFuncs)
 
-	var totalTimeF1, totalTimeF2 time.Duration
-
-	// Run the first function multiple times in a goroutine
-	go func() {
-		defer wg.Done()
-		for i := 0; i < iterations; i++ {
-			start := time.Now()
-			f1()
-			totalTimeF1 += time.Since(start)
-		}
-	}()
-
-	// Run the second function multiple times in a goroutine
-	go func() {
-		defer wg.Done()
-		for i := 0; i < iterations; i++ {
-			start := time.Now()
-			f2()
-			totalTimeF2 += time.Since(start)
-		}
-	}()
-
-	// Wait for both goroutines to finish
-	wg.Wait()
-
-	// Calculate average times
-	avgTimeF1 := totalTimeF1 / time.Duration(iterations)
-	avgTimeF2 := totalTimeF2 / time.Duration(iterations)
-
-	// Print the results
-	fmt.Printf("Function 1 average time: %v\n", avgTimeF1)
-	fmt.Printf("Function 2 average time: %v\n", avgTimeF2)
-
-	// Determine which function is slower
-	if avgTimeF1 > avgTimeF2 {
-		fmt.Println("Function 1 is slower.")
-	} else if avgTimeF1 < avgTimeF2 {
-		fmt.Println("Function 2 is slower.")
-	} else {
-		fmt.Println("Both functions have the same average execution time.")
+	// Measure execution time for each function
+	for i, f := range funcs {
+		go func(i int, f func()) {
+			defer wg.Done()
+			var times []time.Duration
+			for j := 0; j < iterations; j++ {
+				start := time.Now()
+				f()
+				elapsed := time.Since(start)
+				times = append(times, elapsed)
+			}
+			allTimes[i] = times
+		}(i, f)
 	}
 
-	return avgTimeF1, avgTimeF2
+	// Wait for all goroutines to finish
+	wg.Wait()
+
+	// Process results
+	for i, times := range allTimes {
+		sort.Slice(times, func(a, b int) bool { return times[a] < times[b] })
+		median := times[len(times)/2]
+		p95 := times[int(float64(len(times))*0.95)]
+
+		fmt.Printf("Function %d:\n", i+1)
+		fmt.Printf("  Median time: %v\n", median)
+		fmt.Printf("  95th percentile time: %v\n", p95)
+		fmt.Printf("  Min time: %v\n", times[0])
+		fmt.Printf("  Max time: %v\n", times[len(times)-1])
+	}
+
+	// Return the median times for further analysis
+	medianTimes := make([]time.Duration, numFuncs)
+	for i, times := range allTimes {
+		medianTimes[i] = times[len(times)/2]
+	}
+
+	return medianTimes
 }

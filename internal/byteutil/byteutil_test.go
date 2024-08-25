@@ -4,9 +4,11 @@ import (
 	"testing"
 )
 
-func TestMax(t *testing.T) {
-	a := [4]byte{1, 2, 3, 4}
-	b := [4]byte{1, 2, 3, 5}
+
+
+func TestMaxByte(t *testing.T) {
+	a := convertInt32ToByte(13)
+	b := convertInt32ToByte(24)
 
 	if !Max(a, b) {
 		t.Errorf("Expected Max(a, b) to be true, got false")
@@ -17,10 +19,25 @@ func TestMax(t *testing.T) {
 	}
 }
 
+func TestMax2Byte(t *testing.T) {
+	a := convertInt32To2Byte(13)
+	b := convertInt32To2Byte(24)
+
+	if !Max2Byte(a, b) {
+		t.Errorf("Expected Max2Byte(a, b) to be true, got false")
+	}
+
+	if Max2Byte(b, a) {
+		t.Errorf("Expected Max2Byte(b, a) to be false, got true")
+	}
+}
+
+
+
 func TestAdd(t *testing.T) {
-	a := [4]byte{1, 2, 3, 4}
-	b := [4]byte{4, 3, 2, 1}
-	expected := [4]byte{5, 5, 5, 5}
+	a := convertInt32To4Byte(4)
+	b := convertInt32To4Byte(12)
+	expected := convertInt32To4Byte(16)
 
 	result := Add(a, b)
 
@@ -32,9 +49,9 @@ func TestAdd(t *testing.T) {
 }
 
 func TestDivide(t *testing.T) {
-	a := [4]byte{8, 4, 6, 2}
-	b := [4]byte{2, 2, 2, 2}
-	expected := [4]byte{4, 2, 3, 1}
+	a := convertInt32To4Byte(12)
+	b := convertInt32To4Byte(3)
+	expected := convertInt32To4Byte(4)
 
 	result := Divide(a, b)
 
@@ -44,4 +61,3 @@ func TestDivide(t *testing.T) {
 		}
 	}
 }
-

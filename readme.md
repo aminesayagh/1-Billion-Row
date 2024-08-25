@@ -251,7 +251,7 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 - Process file on a byte level, to avoid memory allocation.
 - Handle operations of parsing on a byte level, to avoid memory allocation.
 - use a hash (FNV-1a) map key based on the station name, of key sizes of 8 bytes (intended for int32, int64 and pointers), to store the parsed data.
-- (X) - Use [8]byte to store temperature values, to avoid conversion on the parsing operation.
+- Execute the operations on a 16Int of temperature values, the choice has been taking after a performance testings (refer to  `internal/byteutil/byteutil_perf_test.go`), based on multi-criteria decision analysis algorithm (principally MEDIAN, PERCENTILE).
 
 ## Resume
 

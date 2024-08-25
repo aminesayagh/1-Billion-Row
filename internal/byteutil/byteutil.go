@@ -5,20 +5,34 @@ import (
 	"math"
 )
 
-type DefaultByte [4]byte
 
-// MaxBytes compares two DefaultByte values lexicographically and returns true
-// if 'a' is less than 'b'. It acts like the `less` function in sorting.
-func Max(a, b [4]byte) bool {
+func Max(a, b []byte) bool {
 	for i := 0; i < len(a); i++ {
-		if a[i] < b[i] {
-			return true
-		} else if a[i] > b[i] {
-			return false
+		if a[i] != b[i] {
+			return a[i] < b[i]
 		}
 	}
-
 	return false
+}
+
+func Max4Bytes(a, b [4]byte) bool {
+	if a[0] != b[0] {
+		return a[0] < b[0]
+	}
+	if a[1] != b[1] {
+		return a[1] < b[1]
+	}
+	if a[2] != b[2] {
+		return a[2] < b[2]
+	}
+	return a[3] < b[3]
+}
+
+func Max2Byte(a, b [2]byte) bool {
+	if a[0] != b[0] {
+		return a[0] < b[0]
+	}
+	return a[1] < b[1]
 }
 
 func Add(a, b [4]byte) [4]byte {
@@ -57,6 +71,18 @@ func ConvertByteToFloat64(value [4]byte) float64 {
 
 func ConvertTo4Byte(value []byte) [4]byte {
 	var result [4]byte
+	copy(result[:], value)
+	return result
+}
+
+func ConvertTo2Byte(value []byte) [2]byte {
+	var result [2]byte
+	copy(result[:], value)
+	return result
+}
+
+func ConvertTo16Byte(value []byte) [16]byte {
+	var result [16]byte
 	copy(result[:], value)
 	return result
 }
