@@ -2,7 +2,7 @@ package tracker
 
 import (
 	"fmt"
-	"onBillion/config"
+	"oneBillion/config"
 	"os"
 	"runtime"
 	"time"
@@ -120,15 +120,22 @@ func saveMetrics(metricsOutputFilePath string, version string, metrics MetricsMa
 }
 
 // MeasureExecutionTime measures the average execution time of two functions and compares them
-func MeasureExecutionTime(funcs []func(), iterations int) []time.Duration {
+func MeasureExecutionTime(funcs map[string]func(), iterations int) map[string]time.Duration {
 	numFuncs := len(funcs)
-	allTimes := make([][]time.Duration, numFuncs)
+	allTimes := make(map[string][]time.Duration, numFuncs)
+	allTimesStruct := make(map[string]struct{
+		times []time.Duration
+		median time.Duration
+		p95 time.Duration
+		min time.Duration
+		max time.Duration
+	}, numFuncs)
 	var wg sync.WaitGroup
 	wg.Add(numFuncs)
 
 	// Measure execution time for each function
-	for i, f := range funcs {
-		go func(i int, f func()) {
+	for n, f := range funcs {
+		go func(n string, f func()) {
 			defer wg.Done()
 			var times []time.Duration
 			for j := 0; j < iterations; j++ {
@@ -137,31 +144,46 @@ func MeasureExecutionTime(funcs []func(), iterations int) []time.Duration {
 				elapsed := time.Since(start)
 				times = append(times, elapsed)
 			}
-			allTimes[i] = times
-		}(i, f)
+			allTimes[n] = times
+		}(n, f)
 	}
 
 	// Wait for all goroutines to finish
 	wg.Wait()
 
 	// Process results
-	for i, times := range allTimes {
+	for n, times := range allTimes {
 		sort.Slice(times, func(a, b int) bool { return times[a] < times[b] })
 		median := times[len(times)/2]
 		p95 := times[int(float64(len(times))*0.95)]
 
-		fmt.Printf("Function %d:\n", i+1)
+		fmt.Printf("Function %s:\n", n)
 		fmt.Printf("  Median time: %v\n", median)
 		fmt.Printf("  95th percentile time: %v\n", p95)
 		fmt.Printf("  Min time: %v\n", times[0])
 		fmt.Printf("  Max time: %v\n", times[len(times)-1])
+
+		allTimesStruct[n] = struct{
+			times []time.Duration
+			median time.Duration
+			p95 time.Duration
+			min time.Duration
+			max time.Duration
+		}{
+			times: times,
+			median: median,
+			p95: p95,
+			min: times[0],
+			max: times[len(times)-1],
+		}
 	}
 
 	// Return the median times for further analysis
-	medianTimes := make([]time.Duration, numFuncs)
-	for i, times := range allTimes {
-		medianTimes[i] = times[len(times)/2]
+	medianTimes := make(map[string]time.Duration, numFuncs)
+	for n, times := range allTimes {
+		medianTimes[n] = times[len(times)/2]
 	}
+	
 
 	return medianTimes
 }

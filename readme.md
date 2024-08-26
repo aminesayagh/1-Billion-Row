@@ -1,7 +1,5 @@
 # One Billion Data Parsing Project
 
-<!-- a menu index can help -->
-
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -16,7 +14,7 @@
   - [Running the Project](#running-the-project)
 - [Criteria for Success](#criteria-for-success)
 - [The Solution](#the-solution)
-  - [Stage 1: Simple Parsing Solution](#stage-1-simple-parsing-solution)
+  - [Stage 1: Base Parsing Solution](#stage-1-base-parsing-solution)
     - [Process](#process)
     - [Points considered](#points-considered)
     - [Results](#results)
@@ -83,13 +81,16 @@ Here are the software constraints for this project:
 
 ## Configuration
 
-we use the following environment variables to configure the software:
+we use the following environment variables to configure the algorithm:
 
 - `INPUT_FILE_PATH`: The path to the input data csv file to parse.
 - `OUTPUT_FILE_PATH`: The path to the output data csv file to write the parsed data.
 - `METRICS_FILE_PATH`: The path to the metrics data csv file to write the metrics data.
 - `MAX_WORKERS`: The maximum number of workers to use for parsing the data.
 - `CHUNK_SIZE`: The size of the chunk to read from the input file.
+- `LOG_LEVEL`: The log level to use for the logger.
+- `VERSION`: The version of the algorithm.
+- `NUMBER_OF_ROWS`: The number of rows in the input data file.
 
 ## How to Run the Project
 
@@ -99,33 +100,42 @@ The project has the following directory structure:
 
 ```bash
 .
+.
 ├── cmd
 │   ├── faker
-│   │   └── main.go
+│   │   └── facker.go
 │   └── version
-│       └── version_1_simple
+│       └── v1_base
 │           └── main.go
 ├── config
 │   └── config.go
 ├── data
 │   ├── metrics.log
 │   ├── output.csv
+│   ├── output_test.csv
 │   ├── weather_data.csv
+│   ├── weather_data_test.csv
 ├── go.mod
 ├── go.sum
 ├── internal
 │   ├── context
 │   │   └── context.go
-│   ├── logger
-│   │   ├── logger.go
-│   │   └── logger_test.go
+│   ├── hashutil
+│   │   ├── hashutil.go
+│   │   └── hashutil_test.go
 │   └── tracker
 │       └── tracker.go
+├── LICENSE
 ├── main.go
+├── main_test.go
 ├── readme.md
 └── scripts
     ├── update_and_run.sh
+    └── weater_data.sh
 ```
+
+- All the helper code is in the `internal` directory. The `cmd` directory contains the main entry points for the project. The `config` directory contains the configuration for the project. The `data` directory contains the input and output data files. The `scripts` directory contains the bash scripts to run the project.
+- Every version of the project is in a separate branch, and on a separate directory in the `cmd/version` directory.
 
 ### Environment Variables
 
@@ -144,14 +154,12 @@ NUMBER_OF_ROWS = 1000000000
 
 ### Running the Project
 
-To run the project, their is a bash script `update_and_run.sh` that you can use on a Linux machine. The script update the go version to 1.22.5, update the go modules,
-export the environment variables, and run the project.
+To run the project, their is a bash script `update_and_run.sh` that you can use on a Linux machine. The script update the go version to 1.22.5, update the go modules, and run the project.
 
 ```bash
 chmod +x ./scripts/update_and_run.sh
 ./scripts/update_and_run.sh
 ```
-
 
 ## Measurements and Metrics
 
@@ -162,61 +170,32 @@ The project will measure the following metrics:
 
 To measure these metrics, we implemented the function `measure` that will write the metrics to a file, stop the process if any of the metrics exceed the constraints, and print the metrics to the console.
 
-```go
-func tracker(f func()) {
- done := make(chan bool)
- metrics := make(chan MetricsMap)
- aggregatedMetrics := make(MetricsMap)
+Check the [`tracker` module](https://github.com/aminesayagh/1-Billion-row/blob/stage_1_simple_implementation/internal/tracker/tracker.go) in the directory `internal/tracker/tracker.go` for more details.
 
- conf := config.GetInstance()
+## Measurements and Metrics on testing
 
- version := conf.Version
- metricsOutputFilePath := conf.MetricsFilePath
+On testing face of the project, the following time metrics inspired from `MCDA` (multi-criteria decision analysis) has been tracked on the comparison between different strategy of parsing the data:
 
- go func() {
-  memory(func() {
-   timer(f, metrics)
-  }, metrics)
-
-  done <- true
- }()
-
- select {
- case <-done:
-  fmt.Println("Function execution completed.")
-  saveMetrics(metricsOutputFilePath, version, aggregatedMetrics)
-  return
- case m := <-metrics:
-  for k, v := range m {
-   fmt.Printf("%s: %s\n", k, v)
-   aggregatedMetrics[k] = v
-  }
-
- case <-time.After(10 * time.Minute):
-  fmt.Println("Function execution timed out.")
- }
-}
-```
-
-Check the [`tracker` function](https://github.com/aminesayagh/1-Billion-row/blob/stage_1_simple_implementation/internal/tracker/tracker.go) in the directory `internal/tracker/tracker.go` for more details.
-
-## Helper Functions
+- Median Execution Time: The median time taken to execute the strategy.
+- Percentile 90 Execution Time: The time taken to execute the strategy for 90% of the data.
+- Minimum Execution Time: The minimum time taken to execute the strategy.
+- Maximum Execution Time: The maximum time taken to execute the strategy.
 
 ## Criteria for Success
 
 The project will be considered successful if it meets the following criteria:
 
-- The software parses the input data file correctly.
-- The software writes the output data file correctly.
-- The software respects the hardware constraints.
-- The software respects the software constraints.
-- The software is well-documented.
+- The solution parses the input data file correctly.
+- The solution writes the output data file correctly.
+- The solution respects the hardware constraints.
+- The solution respects the solution constraints.
+- The solution is well-documented.
 
 ## The Solution
 
 To achieve the best performance, we separate the stages of the development of our parsing solution on the following steps (separate branches `<stage_{number}_{title}>`):
 
-### Stage 1: Simple Parsing Solution
+### Stage 1: Base Parsing Solution
 
 In this stage, the parsing solution is a simple one threaded solution, we took on consideration this following points to achieve the best performance:
 
@@ -234,32 +213,29 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 - Use `strings.Index` Instead of `strings.Split` to avoid memory allocation.
 - Use maps to store the parsed data, with a size of 100,000 records, referencing the estimated number of stations in the data.
 - Increase the Buffer size for the `bufio.Scanner` to 64 * 1024 bytes.
-
+- Process file on a byte level, to avoid memory allocation.
+- Compare the performance of the generation of map keys based on the station name, between the use of `strings` and `bytes` of 16 bytes, and a Hash (FNV-1a), based on multi-criteria decision analysis, the choice was to use the `string` type.
+- Cache the temperature values generated on float64 to avoid conversion on each iteration.
 
 #### Results
 
-- Execution time: 2m19.292442845s.
-- Allocated memory: 4.07 MB.
-- Total memory Allocated: 17939.17 MB.
-- System memory used: 13.31 MB.
-- Heap memory used: 4.07 MB.
-
-### Stage 2: Byte Parsing Solution
-
-#### Points considered
-
-- Process file on a byte level, to avoid memory allocation.
-- Handle operations of parsing on a byte level, to avoid memory allocation.
-- use a hash (FNV-1a) map key based on the station name, of key sizes of 8 bytes (intended for int32, int64 and pointers), to store the parsed data.
-- Execute the operations on a 16Int of temperature values, the choice has been taking after a performance testings (refer to  `internal/byteutil/byteutil_perf_test.go`), based on multi-criteria decision analysis algorithm (principally MEDIAN, PERCENTILE).
+- Execution time: 2m40.36641632s.
+- Allocated memory: 46.02 MB.
+- Total memory Allocated: 16724.07 MB.
+- System memory used: 67.19 MB.
+- Heap memory used: 46.02 MB.
 
 ## Resume
 
 | Stage                   | Execution Time    | Total Memory Allocated |
 |-------------------------|-------------------|------------------------|
-| Stage 1: Simple Parsing | 2m19.292442845s   | 17939.17 MB            |
+| Stage 1: Simple Parsing | 2m40.36641632s    | 16724.07 MB            |
 
 ## References
+
+- Go Programming Language Documentation
+- MCDA Techniques
+- FNV-1a Hash Algorithm
 
 ## License
 
