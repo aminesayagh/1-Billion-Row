@@ -23,3 +23,484 @@
 2024-08-20-1.4.0-Total Alloc Memory=17939.17 MB
 2024-08-20-1.4.0-Sys Memory=13.31 MB
 2024-08-20-1.4.0-Heap Memory=4.07 MB
+2024-08-21-1.4.0-Heap Memory=0.14 MB
+2024-08-21-1.4.0-Alloc Memory=0.14 MB
+2024-08-21-1.4.0-Execution Time=1m23.488486223s
+2024-08-21-1.4.0-Total Alloc Memory=0.14 MB
+2024-08-21-1.4.0-Sys Memory=0.25 MB
+ Version: 1.4.0
+2024-08-22 08:50:24-1.4.0-Total Alloc Memory-0.14 MB
+2024-08-22 08:50:24-1.4.0-Sys Memory-0.31 MB
+2024-08-22 08:50:24-1.4.0-Execution Time-5m54.162918686s
+2024-08-22 08:50:24-1.4.0-Heap Memory-0.09 MB
+2024-08-22 08:50:24-1.4.0-Alloc Memory-0.09 MB
+Version: 1.4.0
+2024-08-22 09:16:12-1.4.0-Total Alloc Memory-0.14 MB
+2024-08-22 09:16:12-1.4.0-Sys Memory-0.00 MB
+2024-08-22 09:16:12-1.4.0-Heap Memory-0.14 MB
+2024-08-22 09:16:12-1.4.0-Execution Time-1m49.441121901s
+2024-08-22 09:16:12-1.4.0-Alloc Memory-0.14 MB
+Version: 1.4.0
+2024-08-22 09:17:46-1.4.0-Alloc Memory-0.14 MB
+2024-08-22 09:17:46-1.4.0-Total Alloc Memory-0.14 MB
+2024-08-22 09:17:46-1.4.0-Sys Memory-0.00 MB
+2024-08-22 09:17:46-1.4.0-Heap Memory-0.14 MB
+2024-08-22 09:17:46-1.4.0-Execution Time-1m17.746186901s
+Version: 1.4.0
+2024-08-24 09:36:17-1.4.0-Execution Time-1m53.122726968s
+2024-08-24 09:36:17-1.4.0-Alloc Memory-0.14 MB
+2024-08-24 09:36:17-1.4.0-Total Alloc Memory-0.14 MB
+2024-08-24 09:36:17-1.4.0-Sys Memory-0.00 MB
+2024-08-24 09:36:17-1.4.0-Heap Memory-0.14 MB
+Version: 1.4.0
+2024-08-24 11:49:20-1.4.0-Alloc Memory-0.13 MB
+2024-08-24 11:49:20-1.4.0-Total Alloc Memory-0.18 MB
+2024-08-24 11:49:20-1.4.0-Sys Memory-0.06 MB
+2024-08-24 11:49:20-1.4.0-Heap Memory-0.13 MB
+2024-08-24 11:49:20-1.4.0-Execution Time-3m25.055254131s
+Version: 1.4.0
+2024-08-24 11:51:51-1.4.0-Execution Time-2m19.920101933s
+2024-08-24 11:51:51-1.4.0-Alloc Memory-0.13 MB
+2024-08-24 11:51:51-1.4.0-Total Alloc Memory-0.17 MB
+2024-08-24 11:51:51-1.4.0-Sys Memory-0.56 MB
+2024-08-24 11:51:51-1.4.0-Heap Memory-0.13 MB
+Version: 1.4.0
+2024-08-24 11:55:44-1.4.0-Sys Memory-0.31 MB
+2024-08-24 11:55:44-1.4.0-Heap Memory-0.09 MB
+2024-08-24 11:55:44-1.4.0-Execution Time-2m16.819312316s
+2024-08-24 11:55:44-1.4.0-Alloc Memory-0.09 MB
+2024-08-24 11:55:44-1.4.0-Total Alloc Memory-0.14 MB
+Version: 1.4.0
+2024-08-24 11:58:24-1.4.0-Execution Time-2m16.352779172s
+2024-08-24 11:58:24-1.4.0-Heap Memory-0.09 MB
+2024-08-24 11:58:24-1.4.0-Alloc Memory-0.09 MB
+2024-08-24 11:58:24-1.4.0-Total Alloc Memory-0.14 MB
+2024-08-24 11:58:24-1.4.0-Sys Memory-0.31 MB
+Version: 1.4.0
+2024-08-24 12:06:47-1.4.0-Execution Time-2m4.422751069s
+2024-08-24 12:06:47-1.4.0-Total Alloc Memory-1.98 MB
+2024-08-24 12:06:47-1.4.0-Sys Memory-0.38 MB
+2024-08-24 12:06:47-1.4.0-Heap Memory-1.95 MB
+2024-08-24 12:06:47-1.4.0-Alloc Memory-1.95 MB
+Version: 1.4.0
+2024-08-24 12:14:47-1.4.0-Execution Time-2m8.174684659s
+2024-08-24 12:14:47-1.4.0-Alloc Memory-3.53 MB
+2024-08-24 12:14:47-1.4.0-Total Alloc Memory-3.57 MB
+2024-08-24 12:14:47-1.4.0-Sys Memory-4.06 MB
+2024-08-24 12:14:47-1.4.0-Heap Memory-3.53 MB
+Version: 1.4.0
+2024-08-24 12:17:38-1.4.0-Sys Memory-4.31 MB
+2024-08-24 12:17:38-1.4.0-Heap Memory-3.45 MB
+2024-08-24 12:17:38-1.4.0-Alloc Memory-3.45 MB
+2024-08-24 12:17:38-1.4.0-Execution Time-1m41.656830296s
+2024-08-24 12:17:38-1.4.0-Total Alloc Memory-3.57 MB
+Version: 1.4.0
+2024-08-24 12:21:18-1.4.0-Execution Time-42.365089816s
+2024-08-24 12:21:18-1.4.0-Alloc Memory-3.52 MB
+2024-08-24 12:21:18-1.4.0-Total Alloc Memory-3.52 MB
+2024-08-24 12:21:18-1.4.0-Sys Memory-4.25 MB
+2024-08-24 12:21:18-1.4.0-Heap Memory-3.52 MB
+Version: 1.4.0
+2024-08-24 12:24:23-1.4.0-Total Alloc Memory-3.57 MB
+2024-08-24 12:24:23-1.4.0-Sys Memory-4.00 MB
+2024-08-24 12:24:23-1.4.0-Heap Memory-3.57 MB
+2024-08-24 12:24:23-1.4.0-Execution Time-1m18.053904641s
+2024-08-24 12:24:23-1.4.0-Alloc Memory-3.57 MB
+Version: 1.4.0
+2024-08-24 12:29:37-1.4.0-Execution Time-1m11.70236205s
+2024-08-24 12:29:37-1.4.0-Alloc Memory-1.98 MB
+2024-08-24 12:29:37-1.4.0-Total Alloc Memory-1.98 MB
+2024-08-24 12:29:37-1.4.0-Sys Memory-0.00 MB
+2024-08-24 12:29:37-1.4.0-Heap Memory-1.98 MB
+Version: 1.4.0
+2024-08-24 12:35:18-1.4.0-Heap Memory-2.00 MB
+2024-08-24 12:35:18-1.4.0-Alloc Memory-2.00 MB
+2024-08-24 12:35:18-1.4.0-Total Alloc Memory-2.00 MB
+2024-08-24 12:35:18-1.4.0-Execution Time-1m13.94186079s
+2024-08-24 12:35:18-1.4.0-Sys Memory-0.00 MB
+Version: 1.4.0
+2024-08-24 12:38:14-1.4.0-Execution Time-1m22.288336442s
+2024-08-24 12:38:14-1.4.0-Alloc Memory-2.02 MB
+2024-08-24 12:38:14-1.4.0-Total Alloc Memory-2.02 MB
+2024-08-24 12:38:14-1.4.0-Sys Memory-0.25 MB
+2024-08-24 12:38:14-1.4.0-Heap Memory-2.02 MB
+Version: 1.4.0
+2024-08-25 08:19:51-1.4.0-Execution Time-4m35.793760053s
+2024-08-25 08:19:51-1.4.0-Alloc Memory-1.93 MB
+2024-08-25 08:19:51-1.4.0-Total Alloc Memory-1.97 MB
+2024-08-25 08:19:51-1.4.0-Sys Memory-0.06 MB
+2024-08-25 08:19:51-1.4.0-Heap Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:21:33-1.4.0-Sys Memory-0.25 MB
+2024-08-25 08:21:33-1.4.0-Execution Time-1m24.38327436s
+2024-08-25 08:21:33-1.4.0-Heap Memory-1.97 MB
+2024-08-25 08:21:33-1.4.0-Alloc Memory-1.97 MB
+2024-08-25 08:21:33-1.4.0-Total Alloc Memory-1.97 MB
+Version: 1.4.0
+2024-08-25 08:44:49-1.4.0-Execution Time-1.063684ms
+2024-08-25 08:44:49-1.4.0-Sys Memory-0.00 MB
+2024-08-25 08:44:49-1.4.0-Heap Memory-1.94 MB
+2024-08-25 08:44:49-1.4.0-Alloc Memory-1.94 MB
+2024-08-25 08:44:49-1.4.0-Total Alloc Memory-1.94 MB
+Version: 1.4.0
+2024-08-25 08:52:10-1.4.0-Execution Time-1.234983ms
+2024-08-25 08:52:10-1.4.0-Alloc Memory-1.93 MB
+2024-08-25 08:52:10-1.4.0-Total Alloc Memory-1.93 MB
+2024-08-25 08:52:10-1.4.0-Sys Memory-0.00 MB
+2024-08-25 08:52:10-1.4.0-Heap Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:52:41-1.4.0-Execution Time-861.71µs
+2024-08-25 08:52:41-1.4.0-Alloc Memory-1.93 MB
+2024-08-25 08:52:41-1.4.0-Total Alloc Memory-1.93 MB
+2024-08-25 08:52:41-1.4.0-Sys Memory-0.00 MB
+2024-08-25 08:52:41-1.4.0-Heap Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:53:02-1.4.0-Sys Memory-0.00 MB
+2024-08-25 08:53:02-1.4.0-Heap Memory-1.93 MB
+2024-08-25 08:53:02-1.4.0-Execution Time-1.216058ms
+2024-08-25 08:53:02-1.4.0-Alloc Memory-1.93 MB
+2024-08-25 08:53:02-1.4.0-Total Alloc Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:54:36-1.4.0-Total Alloc Memory-1.93 MB
+2024-08-25 08:54:36-1.4.0-Sys Memory-0.00 MB
+2024-08-25 08:54:36-1.4.0-Execution Time-1.429033ms
+2024-08-25 08:54:36-1.4.0-Heap Memory-1.93 MB
+2024-08-25 08:54:36-1.4.0-Alloc Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:55:53-1.4.0-Total Alloc Memory-1.93 MB
+2024-08-25 08:55:53-1.4.0-Sys Memory-0.00 MB
+2024-08-25 08:55:53-1.4.0-Heap Memory-1.93 MB
+2024-08-25 08:55:53-1.4.0-Execution Time-1.138282ms
+2024-08-25 08:55:53-1.4.0-Alloc Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:57:31-1.4.0-Sys Memory-4.00 MB
+2024-08-25 08:57:31-1.4.0-Heap Memory-1.93 MB
+2024-08-25 08:57:31-1.4.0-Execution Time-1.06188ms
+2024-08-25 08:57:31-1.4.0-Alloc Memory-1.93 MB
+2024-08-25 08:57:31-1.4.0-Total Alloc Memory-1.93 MB
+Version: 1.4.0
+2024-08-25 08:59:03-1.4.0-Execution Time-1.612854ms
+2024-08-25 08:59:03-1.4.0-Heap Memory-1.93 MB
+2024-08-25 08:59:03-1.4.0-Alloc Memory-1.93 MB
+2024-08-25 08:59:03-1.4.0-Total Alloc Memory-1.93 MB
+2024-08-25 08:59:03-1.4.0-Sys Memory-4.00 MB
+Version: 1.4.0
+2024-08-25 09:00:59-1.4.0-Execution Time-1.886262ms
+2024-08-25 09:00:59-1.4.0-Heap Memory-1.99 MB
+2024-08-25 09:00:59-1.4.0-Alloc Memory-1.99 MB
+2024-08-25 09:00:59-1.4.0-Total Alloc Memory-1.99 MB
+2024-08-25 09:00:59-1.4.0-Sys Memory-0.00 MB
+Version: 1.4.0
+2024-08-25 09:03:15-1.4.0-Execution Time-2.485664ms
+2024-08-25 09:03:15-1.4.0-Sys Memory-0.00 MB
+2024-08-25 09:03:15-1.4.0-Heap Memory-1.99 MB
+2024-08-25 09:03:15-1.4.0-Alloc Memory-1.99 MB
+2024-08-25 09:03:15-1.4.0-Total Alloc Memory-1.99 MB
+Version: 1.4.0
+2024-08-25 09:04:05-1.4.0-Sys Memory-0.00 MB
+2024-08-25 09:04:05-1.4.0-Execution Time-2.374027ms
+2024-08-25 09:04:05-1.4.0-Heap Memory-1.99 MB
+2024-08-25 09:04:05-1.4.0-Alloc Memory-1.99 MB
+2024-08-25 09:04:05-1.4.0-Total Alloc Memory-1.99 MB
+Version: 1.4.0
+2024-08-25 09:12:13-1.4.0-Total Alloc Memory-3.59 MB
+2024-08-25 09:12:13-1.4.0-Execution Time-795.918µs
+2024-08-25 09:12:13-1.4.0-Sys Memory-4.06 MB
+2024-08-25 09:12:13-1.4.0-Heap Memory-3.59 MB
+2024-08-25 09:12:13-1.4.0-Alloc Memory-3.59 MB
+Version: 1.4.0
+2024-08-25 09:13:21-1.4.0-Total Alloc Memory-3.59 MB
+2024-08-25 09:13:21-1.4.0-Sys Memory-4.00 MB
+2024-08-25 09:13:21-1.4.0-Heap Memory-3.59 MB
+2024-08-25 09:13:21-1.4.0-Alloc Memory-3.59 MB
+2024-08-25 09:13:21-1.4.0-Execution Time-775.149µs
+Version: 1.4.0
+2024-08-25 09:13:29-1.4.0-Execution Time-2.492335ms
+2024-08-25 09:13:29-1.4.0-Heap Memory-3.59 MB
+2024-08-25 09:13:29-1.4.0-Alloc Memory-3.59 MB
+2024-08-25 09:13:29-1.4.0-Total Alloc Memory-3.59 MB
+2024-08-25 09:13:29-1.4.0-Sys Memory-4.00 MB
+Version: 1.4.0
+2024-08-25 09:13:49-1.4.0-Sys Memory-4.06 MB
+2024-08-25 09:13:49-1.4.0-Heap Memory-3.59 MB
+2024-08-25 09:13:49-1.4.0-Alloc Memory-3.59 MB
+2024-08-25 09:13:49-1.4.0-Execution Time-846.431µs
+2024-08-25 09:13:49-1.4.0-Total Alloc Memory-3.59 MB
+Version: 1.4.0
+2024-08-25 09:14:43-1.4.0-Alloc Memory-3.49 MB
+2024-08-25 09:14:43-1.4.0-Total Alloc Memory-3.59 MB
+2024-08-25 09:14:43-1.4.0-Sys Memory-4.31 MB
+2024-08-25 09:14:43-1.4.0-Heap Memory-3.49 MB
+2024-08-25 09:14:43-1.4.0-Execution Time-2.508917ms
+Version: 1.4.0
+2024-08-25 09:15:36-1.4.0-Execution Time-2.022694ms
+2024-08-25 09:15:36-1.4.0-Alloc Memory-3.59 MB
+2024-08-25 09:15:36-1.4.0-Total Alloc Memory-3.59 MB
+2024-08-25 09:15:36-1.4.0-Sys Memory-4.06 MB
+2024-08-25 09:15:36-1.4.0-Heap Memory-3.59 MB
+Version: 1.4.0
+2024-08-25 09:16:15-1.4.0-Execution Time-2.436982ms
+2024-08-25 09:16:15-1.4.0-Alloc Memory-3.59 MB
+2024-08-25 09:16:15-1.4.0-Total Alloc Memory-3.59 MB
+2024-08-25 09:16:15-1.4.0-Sys Memory-4.00 MB
+2024-08-25 09:16:15-1.4.0-Heap Memory-3.59 MB
+Version: 1.4.0
+2024-08-25 09:20:41-1.4.0-Execution Time-3m1.373278298s
+2024-08-25 09:20:41-1.4.0-Alloc Memory-5.94 MB
+2024-08-25 09:20:41-1.4.0-Total Alloc Memory-11984.41 MB
+2024-08-25 09:20:41-1.4.0-Sys Memory-13.06 MB
+2024-08-25 09:20:41-1.4.0-Heap Memory-5.94 MB
+Version: 1.4.0
+2024-08-25 09:25:12-1.4.0-Execution Time-2m28.832899514s
+2024-08-25 09:25:12-1.4.0-Alloc Memory-6.38 MB
+2024-08-25 09:25:12-1.4.0-Total Alloc Memory-11984.39 MB
+2024-08-25 09:25:12-1.4.0-Sys Memory-13.00 MB
+2024-08-25 09:25:12-1.4.0-Heap Memory-6.38 MB
+Version: 1.4.0
+2024-08-25 09:36:55-1.4.0-Execution Time-1m27.343381073s
+2024-08-25 09:36:55-1.4.0-Alloc Memory-5.06 MB
+2024-08-25 09:36:55-1.4.0-Total Alloc Memory-11984.40 MB
+2024-08-25 09:36:55-1.4.0-Sys Memory-13.06 MB
+2024-08-25 09:36:55-1.4.0-Heap Memory-5.06 MB
+Version: 1.4.0
+2024-08-25 09:50:43-1.4.0-Total Alloc Memory-2.54 MB
+2024-08-25 09:50:43-1.4.0-Sys Memory-0.00 MB
+2024-08-25 09:50:43-1.4.0-Heap Memory-2.54 MB
+2024-08-25 09:50:43-1.4.0-Execution Time-58.282908252s
+2024-08-25 09:50:43-1.4.0-Alloc Memory-2.54 MB
+Version: 1.4.0
+2024-08-25 09:54:10-1.4.0-Execution Time-50.369644643s
+2024-08-25 09:54:10-1.4.0-Heap Memory-2.54 MB
+2024-08-25 09:54:10-1.4.0-Alloc Memory-2.54 MB
+2024-08-25 09:54:10-1.4.0-Total Alloc Memory-2.54 MB
+2024-08-25 09:54:10-1.4.0-Sys Memory-4.00 MB
+Version: 1.4.0
+2024-08-25 09:57:21-1.4.0-Execution Time-49.36977388s
+2024-08-25 09:57:21-1.4.0-Alloc Memory-19.24 MB
+2024-08-25 09:57:21-1.4.0-Total Alloc Memory-19.28 MB
+2024-08-25 09:57:21-1.4.0-Sys Memory-20.31 MB
+2024-08-25 09:57:21-1.4.0-Heap Memory-19.24 MB
+Version: 1.4.0
+2024-08-25 09:59:32-1.4.0-Execution Time-1m21.572365977s
+2024-08-25 09:59:32-1.4.0-Total Alloc Memory-12008.73 MB
+2024-08-25 09:59:32-1.4.0-Sys Memory-63.06 MB
+2024-08-25 09:59:32-1.4.0-Heap Memory-45.21 MB
+2024-08-25 09:59:32-1.4.0-Alloc Memory-45.21 MB
+Version: 1.4.0
+2024-08-25 10:02:18-1.4.0-Execution Time-59.643051195s
+2024-08-25 10:02:18-1.4.0-Alloc Memory-19.43 MB
+2024-08-25 10:02:18-1.4.0-Total Alloc Memory-19.47 MB
+2024-08-25 10:02:18-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:02:18-1.4.0-Heap Memory-19.43 MB
+Version: 1.4.0
+2024-08-25 10:03:39-1.4.0-Alloc Memory-19.45 MB
+2024-08-25 10:03:39-1.4.0-Total Alloc Memory-19.45 MB
+2024-08-25 10:03:39-1.4.0-Execution Time-4.136658ms
+2024-08-25 10:03:39-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:03:39-1.4.0-Heap Memory-19.45 MB
+Version: 1.4.0
+2024-08-25 10:08:06-1.4.0-Execution Time-4.750146ms
+2024-08-25 10:08:06-1.4.0-Alloc Memory-19.44 MB
+2024-08-25 10:08:06-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:08:06-1.4.0-Sys Memory-20.06 MB
+2024-08-25 10:08:06-1.4.0-Heap Memory-19.44 MB
+Version: 1.4.0
+2024-08-25 10:09:48-1.4.0-Execution Time-665.675µs
+2024-08-25 10:09:48-1.4.0-Alloc Memory-19.44 MB
+2024-08-25 10:09:48-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:09:48-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:09:48-1.4.0-Heap Memory-19.44 MB
+Version: 1.4.0
+2024-08-25 10:11:40-1.4.0-Execution Time-4.535638ms
+2024-08-25 10:11:40-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:11:40-1.4.0-Sys Memory-20.56 MB
+2024-08-25 10:11:40-1.4.0-Heap Memory-19.40 MB
+2024-08-25 10:11:40-1.4.0-Alloc Memory-19.40 MB
+Version: 1.4.0
+2024-08-25 10:13:10-1.4.0-Execution Time-3.036596ms
+2024-08-25 10:13:10-1.4.0-Alloc Memory-19.41 MB
+2024-08-25 10:13:10-1.4.0-Total Alloc Memory-19.45 MB
+2024-08-25 10:13:10-1.4.0-Sys Memory-20.00 MB
+2024-08-25 10:13:10-1.4.0-Heap Memory-19.41 MB
+Version: 1.4.0
+2024-08-25 10:17:57-1.4.0-Execution Time-3.973284ms
+2024-08-25 10:17:57-1.4.0-Alloc Memory-19.41 MB
+2024-08-25 10:17:57-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:17:57-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:17:57-1.4.0-Heap Memory-19.41 MB
+Version: 1.4.0
+2024-08-25 10:18:45-1.4.0-Execution Time-3.380886ms
+2024-08-25 10:18:45-1.4.0-Total Alloc Memory-19.45 MB
+2024-08-25 10:18:45-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:18:45-1.4.0-Heap Memory-19.41 MB
+2024-08-25 10:18:45-1.4.0-Alloc Memory-19.41 MB
+Version: 1.4.0
+2024-08-25 10:19:27-1.4.0-Heap Memory-19.44 MB
+2024-08-25 10:19:27-1.4.0-Alloc Memory-19.44 MB
+2024-08-25 10:19:27-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:19:27-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:19:27-1.4.0-Execution Time-4.066198ms
+Version: 1.4.0
+2024-08-25 10:20:29-1.4.0-Execution Time-6.641887ms
+2024-08-25 10:20:29-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:20:29-1.4.0-Heap Memory-19.40 MB
+2024-08-25 10:20:29-1.4.0-Alloc Memory-19.40 MB
+2024-08-25 10:20:29-1.4.0-Total Alloc Memory-19.44 MB
+Version: 1.4.0
+2024-08-25 10:23:48-1.4.0-Execution Time-4.735799ms
+2024-08-25 10:23:48-1.4.0-Total Alloc Memory-19.45 MB
+2024-08-25 10:23:48-1.4.0-Sys Memory-20.56 MB
+2024-08-25 10:23:48-1.4.0-Heap Memory-19.41 MB
+2024-08-25 10:23:48-1.4.0-Alloc Memory-19.41 MB
+Version: 1.4.0
+2024-08-25 10:24:34-1.4.0-Execution Time-5.596528ms
+2024-08-25 10:24:34-1.4.0-Alloc Memory-19.40 MB
+2024-08-25 10:24:34-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:24:34-1.4.0-Sys Memory-20.06 MB
+2024-08-25 10:24:34-1.4.0-Heap Memory-19.40 MB
+Version: 1.4.0
+2024-08-25 10:27:53-1.4.0-Execution Time-7.000865ms
+2024-08-25 10:27:53-1.4.0-Alloc Memory-19.41 MB
+2024-08-25 10:27:53-1.4.0-Total Alloc Memory-19.44 MB
+2024-08-25 10:27:53-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:27:53-1.4.0-Heap Memory-19.41 MB
+Version: 1.4.0
+2024-08-25 10:32:09-1.4.0-Execution Time-3.930015ms
+2024-08-25 10:32:09-1.4.0-Sys Memory-20.31 MB
+2024-08-25 10:32:09-1.4.0-Heap Memory-19.41 MB
+2024-08-25 10:32:09-1.4.0-Alloc Memory-19.41 MB
+2024-08-25 10:32:09-1.4.0-Total Alloc Memory-19.45 MB
+Version: 1.4.0
+2024-08-25 10:40:16-1.4.0-Execution Time-2m12.68262718s
+2024-08-25 10:40:16-1.4.0-Alloc Memory-37.70 MB
+2024-08-25 10:40:16-1.4.0-Total Alloc Memory-4513.57 MB
+2024-08-25 10:40:16-1.4.0-Sys Memory-42.12 MB
+2024-08-25 10:40:16-1.4.0-Heap Memory-37.70 MB
+Version: 1.4.0
+2024-08-25 10:42:34-1.4.0-Execution Time-2m5.771578992s
+2024-08-25 10:42:34-1.4.0-Heap Memory-31.74 MB
+2024-08-25 10:42:34-1.4.0-Alloc Memory-31.74 MB
+2024-08-25 10:42:34-1.4.0-Total Alloc Memory-4513.57 MB
+2024-08-25 10:42:34-1.4.0-Sys Memory-42.38 MB
+Version: 1.4.0
+2024-08-25 11:44:22-1.4.0-Execution Time-2m2.590479211s
+2024-08-25 11:44:22-1.4.0-Sys Memory-42.38 MB
+2024-08-25 11:44:22-1.4.0-Heap Memory-30.68 MB
+2024-08-25 11:44:22-1.4.0-Alloc Memory-30.68 MB
+2024-08-25 11:44:22-1.4.0-Total Alloc Memory-4513.58 MB
+Version: 1.4.0
+2024-08-25 11:59:20-1.4.0-Sys Memory-42.12 MB
+2024-08-25 11:59:20-1.4.0-Execution Time-2m3.63217348s
+2024-08-25 11:59:20-1.4.0-Heap Memory-34.66 MB
+2024-08-25 11:59:20-1.4.0-Alloc Memory-34.66 MB
+2024-08-25 11:59:20-1.4.0-Total Alloc Memory-4513.58 MB
+Version: 1.4.0
+2024-08-25 12:02:14-1.4.0-Alloc Memory-29.70 MB
+2024-08-25 12:02:14-1.4.0-Total Alloc Memory-4513.59 MB
+2024-08-25 12:02:14-1.4.0-Sys Memory-42.12 MB
+2024-08-25 12:02:14-1.4.0-Heap Memory-29.70 MB
+2024-08-25 12:02:14-1.4.0-Execution Time-2m16.907290905s
+Version: 1.4.0
+2024-08-25 12:06:05-1.4.0-Execution Time-2m34.951997088s
+2024-08-25 12:06:05-1.4.0-Alloc Memory-42.79 MB
+2024-08-25 12:06:05-1.4.0-Total Alloc Memory-16719.90 MB
+2024-08-25 12:06:05-1.4.0-Sys Memory-63.12 MB
+2024-08-25 12:06:05-1.4.0-Heap Memory-42.79 MB
+Version: 1.4.0
+2024-08-25 12:10:57-1.4.0-Execution Time-2m28.313632077s
+2024-08-25 12:10:57-1.4.0-Alloc Memory-54.56 MB
+2024-08-25 12:10:57-1.4.0-Total Alloc Memory-16719.90 MB
+2024-08-25 12:10:57-1.4.0-Sys Memory-62.81 MB
+2024-08-25 12:10:57-1.4.0-Heap Memory-54.56 MB
+Version: 1.4.0
+2024-08-25 12:28:12-1.4.0-Execution Time-3m26.346563784s
+2024-08-25 12:28:12-1.4.0-Heap Memory-45.43 MB
+2024-08-25 12:28:12-1.4.0-Alloc Memory-45.43 MB
+2024-08-25 12:28:12-1.4.0-Total Alloc Memory-47237.50 MB
+2024-08-25 12:28:12-1.4.0-Sys Memory-62.25 MB
+Version: 1.4.0
+2024-08-25 12:32:21-1.4.0-Alloc Memory-30.94 MB
+2024-08-25 12:32:21-1.4.0-Execution Time-3m29.691743898s
+2024-08-25 12:32:21-1.4.0-Total Alloc Memory-47237.50 MB
+2024-08-25 12:32:21-1.4.0-Sys Memory-66.88 MB
+2024-08-25 12:32:21-1.4.0-Heap Memory-30.94 MB
+Version: 1.4.0
+2024-08-25 12:54:34-1.4.0-Heap Memory-30.66 MB
+2024-08-25 12:54:34-1.4.0-Execution Time-2m25.705491906s
+2024-08-25 12:54:34-1.4.0-Alloc Memory-30.66 MB
+2024-08-25 12:54:34-1.4.0-Total Alloc Memory-16720.09 MB
+2024-08-25 12:54:34-1.4.0-Sys Memory-62.88 MB
+Version: 1.4.0
+2024-08-25 13:08:43-1.4.0-Heap Memory-56.03 MB
+2024-08-25 13:08:43-1.4.0-Execution Time-3m0.002484726s
+2024-08-25 13:08:43-1.4.0-Alloc Memory-56.03 MB
+2024-08-25 13:08:43-1.4.0-Total Alloc Memory-16720.87 MB
+2024-08-25 13:08:43-1.4.0-Sys Memory-63.06 MB
+Version: 1.4.0
+2024-08-25 13:13:20-1.4.0-Sys Memory-62.56 MB
+2024-08-25 13:13:20-1.4.0-Execution Time-2m56.041413692s
+2024-08-25 13:13:20-1.4.0-Heap Memory-45.99 MB
+2024-08-25 13:13:20-1.4.0-Alloc Memory-45.99 MB
+2024-08-25 13:13:20-1.4.0-Total Alloc Memory-16720.86 MB
+Version: 1.4.0
+2024-08-25 13:18:52-1.4.0-Execution Time-2m54.770957401s
+2024-08-25 13:18:52-1.4.0-Alloc Memory-35.69 MB
+2024-08-25 13:18:52-1.4.0-Total Alloc Memory-16724.63 MB
+2024-08-25 13:18:52-1.4.0-Sys Memory-67.13 MB
+2024-08-25 13:18:52-1.4.0-Heap Memory-35.69 MB
+Version: 1.4.0
+2024-08-25 13:42:15-1.4.0-Execution Time-2m28.282835863s
+2024-08-25 13:42:15-1.4.0-Alloc Memory-36.18 MB
+2024-08-25 13:42:15-1.4.0-Total Alloc Memory-16723.66 MB
+2024-08-25 13:42:15-1.4.0-Sys Memory-62.38 MB
+2024-08-25 13:42:15-1.4.0-Heap Memory-36.18 MB
+Version: 1.4.0
+2024-08-25 13:49:17-1.4.0-Execution Time-2m55.06609893s
+2024-08-25 13:49:17-1.4.0-Alloc Memory-39.02 MB
+2024-08-25 13:49:17-1.4.0-Total Alloc Memory-16724.63 MB
+2024-08-25 13:49:17-1.4.0-Sys Memory-67.19 MB
+2024-08-25 13:49:17-1.4.0-Heap Memory-39.02 MB
+Version: 1.4.0
+2024-08-25 13:59:28-1.4.0-Alloc Memory-36.52 MB
+2024-08-25 13:59:28-1.4.0-Total Alloc Memory-35082.18 MB
+2024-08-25 13:59:28-1.4.0-Sys Memory-62.62 MB
+2024-08-25 13:59:28-1.4.0-Heap Memory-36.52 MB
+2024-08-25 13:59:28-1.4.0-Execution Time-5m46.240459191s
+Version: 1.4.0
+2024-08-25 14:02:16-1.4.0-Alloc Memory-40.12 MB
+2024-08-25 14:02:16-1.4.0-Execution Time-2m33.850778521s
+2024-08-25 14:02:16-1.4.0-Total Alloc Memory-16723.82 MB
+2024-08-25 14:02:16-1.4.0-Sys Memory-62.81 MB
+2024-08-25 14:02:16-1.4.0-Heap Memory-40.12 MB
+Version: 1.4.0
+2024-08-25 14:09:03-1.4.0-Execution Time-2m17.082267829s
+2024-08-25 14:09:03-1.4.0-Total Alloc Memory-16724.03 MB
+2024-08-25 14:09:03-1.4.0-Sys Memory-63.06 MB
+2024-08-25 14:09:03-1.4.0-Heap Memory-54.14 MB
+2024-08-25 14:09:03-1.4.0-Alloc Memory-54.14 MB
+Version: 1.4.0
+2024-08-25 14:21:13-1.4.0-Total Alloc Memory-16724.11 MB
+2024-08-25 14:21:13-1.4.0-Sys Memory-63.31 MB
+2024-08-25 14:21:13-1.4.0-Heap Memory-36.47 MB
+2024-08-25 14:21:13-1.4.0-Execution Time-2m18.823702471s
+2024-08-25 14:21:13-1.4.0-Alloc Memory-36.47 MB
+Version: 1.4.0
+Version: 1.4.0
+Version: 1.4.0
+2024-08-26 09:40:04-1.4.0-Execution Time-2m41.829544384s
+2024-08-26 09:40:04-1.4.0-Alloc Memory-55.88 MB
+2024-08-26 09:40:04-1.4.0-Total Alloc Memory-16724.12 MB
+2024-08-26 09:40:04-1.4.0-Sys Memory-66.88 MB
+2024-08-26 09:40:04-1.4.0-Heap Memory-55.88 MB
+Version: 1.4.0
+2024-08-26 09:47:23-1.4.0-Alloc Memory-46.02 MB
+2024-08-26 09:47:23-1.4.0-Total Alloc Memory-16724.07 MB
+2024-08-26 09:47:23-1.4.0-Sys Memory-67.19 MB
+2024-08-26 09:47:23-1.4.0-Heap Memory-46.02 MB
+2024-08-26 09:47:23-1.4.0-Execution Time-2m46.063254158s
+Version: 1.4.0
+2024-08-26 09:56:10-1.4.0-Alloc Memory-46.77 MB
+2024-08-26 09:56:10-1.4.0-Total Alloc Memory-16724.08 MB
+2024-08-26 09:56:10-1.4.0-Execution Time-2m40.36641632s
+2024-08-26 09:56:10-1.4.0-Sys Memory-67.13 MB
+2024-08-26 09:56:10-1.4.0-Heap Memory-46.77 MB

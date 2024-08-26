@@ -3,10 +3,10 @@ package context
 import (
 	"bufio"
 	"fmt"
-	"onBillion/config"
 	"os"
 	"runtime"
 	"syscall"
+	"oneBillion/config"
 )
 
 func HardwareContext() {
