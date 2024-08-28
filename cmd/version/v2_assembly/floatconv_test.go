@@ -51,14 +51,28 @@ func TestBytesToNumericBytes(t *testing.T) {
 			input:    []byte(""),
 			expected: []byte{},
 		},
+		{
+			name:     "Negative number with leading and trailing spaces",
+			input:    []byte("  -123  "),
+			expected: []byte{'-', 1, 2, 3},
+		},
+		{
+			name:     "Negative number with leading and trailing spaces and decimals",
+			input:    []byte("  -123.45  "),
+			expected: []byte{'-', 1, 2, 3, '.', 4, 5},
+		},
+		{
+			name:    "Last characters are a '.'",
+			input:   []byte("123."),
+			expected: []byte{1, 2, 3},
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Logf("Input: %v", tc.input)
-			BytesToNumericBytes(tc.input)
+			BytesToNumericBytes(tc.input) 
 			
-
 			if !reflect.DeepEqual(tc.input, tc.expected) {
 				t.Errorf("Expected %v, but got %v", tc.expected, tc.input)
 			} else {

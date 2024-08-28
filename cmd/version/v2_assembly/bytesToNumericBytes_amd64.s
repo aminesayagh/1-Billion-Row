@@ -1,37 +1,60 @@
 #include "textflag.h"
 
-TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0
-    MOVQ    len+8(FP), CX      // Load the length of the byte slice into CX
-    MOVQ    b+0(FP), AX        // Load the pointer to the byte slice into AX
-    MOVQ    AX, DX             // Copy the pointer to DX for iteration
-    JMP     loop               // Jump to the loop
-
+TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0 
+    MOVQ    len+8(FP), CX       // Load the length of the byte slice into CX
+    MOVQ    B+0(FP), DX         // Load the pointer to the byte slice into DX
+    MOVQ    DX, SI              // SI will be our destination pointer for valid bytes
+    
 loop:
-    CMPQ    CX, $0             // Check if CX (length) is 0
-    JE      done               // If so, we're done
+    CMPQ    CX, $0              // Check if CX (length) is 0
+    JLE     done                // If it is, we are done, JLE is jump if less than or equal to
 
-    MOVB    (DX), AX           // Load the next byte from the slice into AX, zero-extended
-    CMPB    AL, $'-'           // Compare the byte with '-'
-    JE      handle_sign        // If it's '-', handle it as a sign
-    CMPB    AL, $'+'           // Compare the byte with '+'
-    JE      handle_sign        // If it's '+', handle it as a sign
-    CMPB    AL, $'0'           // Compare the byte with '0'
-    JL      next_char          // If less than '0', skip to the next character
-    CMPB    AL, $'9'           // Compare the byte with '9'
-    JG      next_char          // If greater than '9', skip to the next character
+    MOVB    (DX), AL           // Load the next byte from the slice into AL
 
-    SUBB    $'0', AL           // Convert the byte to a numeric value
-    MOVB    AL, (DX)           // Store the converted value back in the slice
+    CMPB    AL, $'-'            // Compare AL to '-'
+    JE      copy_char           // If they are equal, jump to copy_char
+
+    CMPB    AL, $'+'            // Compare AL to '+'
+    JE      copy_char           // If they are equal, jump to copy_char
+
+    CMPB    AL, $'.'            // Compare AL to '.'
+    JE      copy_char           // If they are equal, jump to copy_char
+
+    CMPB    AL, $'0'            // Compare AL to '0'
+    JL      skip_char           // If AL is less than '0', jump to skip
+
+    CMPB    AL, $'9'            // Compare AL to '9'
+    JG      skip_char           // If AL is greater than '9', jump to skip
+
+    SUBB    $'0', AL            // Subtract '0' from AL to get the numeric value
+
+copy_char:
+    MOVB    AL, (SI)            // Copy the valid character to the current SI position
+    INCQ    SI                  // Increment the destination pointer
+    JMP     next_char           // Jump to next_char
+
+skip_char:
+    MOVB    $0, (SI)            // Copy a null byte to the current SI position
+    JMP     next_char           // Jump to next_char
 
 next_char:
-    INCQ    DX                 // Move to the next byte in the slice
-    DECQ    CX                 // Decrement the loop counter
-    JMP     loop               // Repeat the loop
+    INCQ    DX                  // Increment the source pointer
+    DECQ    CX                  // Decrement the loop counter
+    JMP     loop                // Jump to loop
 
-handle_sign:
-    MOVB    AL, (DX)           // Directly copy the sign character
-    JMP     next_char          // Move to the next character
+copy_null:
+    MOVB    $0, (SI)            // Copy a null byte to the current SI position
+    INCQ    SI                  // Increment the destination pointer
+    JMP     copy_null           // Jump to copy_null
 
 done:
-    MOVQ    DX, AX             // Return the pointer to the byte slice
-    RET                        // Return from the function
+fill_nulls:
+    CMPQ   SI, DX              // Compare the destination pointer to the end of the slice
+    JGE     finish              // If the destination pointer is greater than or equal to the end of the slice, jump to finish
+
+    MOVB    $0, (SI)            // Copy a null byte to the current SI position
+    INCQ    SI                  // Increment the destination pointer
+    JMP     fill_nulls          // Jump to fill_nulls
+
+finish:
+    RET
