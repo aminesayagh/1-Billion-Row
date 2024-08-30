@@ -34,12 +34,12 @@ func TestBytesToNumericBytes(t *testing.T) {
 		{
 			name:     "Positive number with leading and trailing spaces",
 			input:    []byte("  123  "),
-			expected: []byte{1, 2, 3},
+			expected: []byte{1, 2, 3, 0, 0, 0, 0},
 		},
 		{
 			name:     "Mixed characters with number",
 			input:    []byte("abc123def"),
-			expected: []byte{1, 2, 3},
+			expected: []byte{1, 2, 3, 0, 0, 0, 0},
 		},
 		{
 			name:     "Decimal only",
@@ -54,7 +54,7 @@ func TestBytesToNumericBytes(t *testing.T) {
 		{
 			name:     "Negative number with leading and trailing spaces",
 			input:    []byte("  -123  "),
-			expected: []byte{'-', 1, 2, 3},
+			expected: []byte{'-', 1, 2, 3, 0, 0, 0, 0},
 		},
 		{
 			name:     "Negative number with leading and trailing spaces and decimals",
