@@ -1,81 +1,154 @@
 #include "textflag.h"
 
-TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0 
-    MOVQ    len+8(FP), CX       // Load the length of the byte slice into CX
-    MOVQ    B+0(FP), DX         // Load the pointer to the byte slice into DX
-    MOVQ    DX, SI              // SI will be our destination pointer for valid bytes
+TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0
+    MOVQ    len+8(FP), CX            // Load the length of the byte slice into CX
+    MOVQ    b+0(FP), DX              // Load the pointer to the byte slice into DX
+    MOVQ    DX, SI                   // SI will be our destination pointer for valid bytes
+    XORQ    AX, AX                   // Clear AX to indicate no errors
 
-    MOVQ    $0, AX               // Initialize AX for the sign check
+    MOVQ    $0, BX                   // Set initial state to q0
+
+main_loop:
+    CMPQ    CX, $0                   // Check if the length is 0
+    JLE     accept                   // If it is, we are done
+
+    // Load the next state based on the value in BX
+    CMPQ    BX, $0                   // If BX == 0, jump to q0
+    JE      q0
+    CMPQ    BX, $1                   // If BX == 1, jump to q1
+    JE      q1
+    CMPQ    BX, $2                   // If BX == 2, jump to q2
+    JE      q2
+    CMPQ    BX, $3                   // If BX == 3, jump to q3
+    JE      q3
+    CMPQ    BX, $4                   // If BX == 4, jump to q4
+    JE      q4
+    CMPQ    BX, $5                   // If BX == 5, jump to q5
+    JE      q5
     
+    JMP     error                    // If we get here, we are in an invalid state
 
-loop:
-    CMPQ    CX, $0              // Check if CX (length) is 0
-    JLE     done                // If it is, we are done, JLE is jump if less than or equal to
+// State q0
+q0:
+    MOVB    (DX), AL                 // Load the current byte into AL
 
-    MOVB    (DX), AL           // Load the next byte from the slice into AL
+    CMPB    AL, $'-'                 // Compare AL to '-'
+    JE      set_state_q2             // If equal, jump to q2
 
-    CMPQ    AX, $0              // Check if AX is greater than 0
-    JNE     has_sign            // If it is, jump to has_sign, JNE is jump if not equal
+    CMPB    AL, $'+'                 // Compare AL to '+'
+    JE      set_state_q2             // If equal, jump to q2
 
-    MOVB    $1, AX               // Set AX to 1
+    CMPB    AL, $'9'                 // Check if AL is greater than '9'
+    JG      error                    // If it is, jump to error
 
-    CMPB    AL, $'-'            // Compare AL to '-'
-    JE      copy_char           // If they are equal, jump to copy_char
+    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
+    MOVQ    $1, BX                   // Set state to q1
+    JMP     process                  // Process the character
 
-    CMPB    AL, $'+'            // Compare AL to '+'
-    JE      copy_char           // If they are equal, jump to copy_char
+set_state_q2:
+    MOVQ    $2, BX                   // Set state to q2
+    JMP     process                  // Process the character
 
-has_sign:
-    CMPB    AX, $2              // Check if AX is equal to 2
-    JL      integer_check       // If it is less than 2, jump to integer_check
+// State q1
+q1:
+    MOVB    (DX), AL                 // Load the next byte
 
-    CMPB    AL, $'.'            // Compare AL to '.'
-    JE      copy_point          // If they are equal, jump to copy_point
+    CMPB    AL, $'.'                 // Check if it's a decimal point
+    JE      set_state_q3             // Jump to q3 if it is
 
-integer_check:
-    MOVB    $2, AX              // Set AX to 2
+    CMPB    AL, $'0'                 // Compare AL to '0'
+    JL      error                    // If less than '0', jump to error
 
+    CMPB    AL, $'9'                 // Compare AL to '9'
+    JG      error                    // If greater than '9', jump to error
     
+    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
+    MOVQ    $1, BX                   // Stay in state q1
+    JMP     process                  // Process the character
 
-    CMPB    AL, $'0'            // Compare AL to '0'
-    JL      skip_char           // If AL is less than '0', jump to skip
+set_state_q3:
+    MOVQ    $3, BX                   // Set state to q3
+    JMP     process                  // Process the character
 
-    CMPB    AL, $'9'            // Compare AL to '9'
-    JG      skip_char           // If AL is greater than '9', jump to skip
+// State q2
+q2:
+    MOVB    (DX), AL                 // Load the next byte
 
-    SUBB    $'0', AL            // Subtract '0' from AL to get the numeric value
+    CMPB    AL, $'0'                 // Compare AL to '0'
+    JL      error                    // If less than '0', jump to error
 
-copy_char:
-    MOVB    AL, (SI)            // Copy the valid character to the current SI position
-    INCQ    SI                  // Increment the destination pointer
-    JMP     next_char           // Jump to next_char
+    CMPB    AL, $'9'                 // Check if AL is greater than '9'
+    JG      error                    // If greater than '9', jump to error
 
-copy_point:
+    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
+    MOVQ    $1, BX                   // Set state to q1
+    JMP     process                  // Process the character
+    
+// State q3
+q3:
+    MOVB    (DX), AL                 // Load the next byte
+    CMPB    AL, $'0'                 // Check if AL is '0'
+    JE      set_state_q5             // Jump to q5 if it is
 
-skip_char:
-    MOVB    $0, (SI)            // Copy a null byte to the current SI position
-    JMP     next_char           // Jump to next_char
+    CMPB    AL, $'9'                 // Check if AL is greater than '9'
+    JG      error                    // If greater than '9', jump to error
 
-next_char:
-    INCQ    DX                  // Increment the source pointer
-    DECQ    CX                  // Decrement the loop counter
-    JMP     loop                // Jump to loop
+    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
+    MOVQ    $4, BX                   // Set state to q4
+    JMP     process                  // Process the character
 
-copy_null:
-    MOVB    $0, (SI)            // Copy a null byte to the current SI position
-    INCQ    SI                  // Increment the destination pointer
-    JMP     copy_null           // Jump to copy_null
+set_state_q5:
+    MOVQ    $5, BX                   // Set state to q5
+    JMP     process                  // Process the character
+
+// State q4
+q4:
+    MOVB    (DX), AL                 // Load the next byte
+    CMPB    AL, $'0'                 // Check if AL is '0'
+    JE      set_state_q5             // Jump to q5 if it is
+
+    CMPB    AL, $'9'                 // Check if AL is greater than '9'
+    JG      error                    // If greater than '9', jump to error
+
+    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
+    MOVQ    $4, BX                   // Stay in state q4
+    JMP     process                  // Process the character
+
+// State q5
+q5:
+    MOVB    (DX), AL                 // Load the next byte
+    CMPB    AL, $'0'                 // Check if AL is '0'
+    JE      q5                       // Stay in state q5 if it is
+
+    CMPB    AL, $'9'                 // Check if AL is greater than '9'
+    JG      error                    // If greater, jump to error
+
+    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
+    MOVQ    $4, BX                   // Set state to q4
+    JMP     process                  // Process the character
+
+// Common Processing Code
+process:
+    MOVB    AL, (SI)                 // Copy the valid character to the current SI position
+    INCQ    SI                       // Increment the destination pointer
+    INCQ    DX                       // Increment the source pointer
+    DECQ    CX                       // Decrement the length
+    JMP     main_loop                // Jump back to main loop
+
+// Accept state
+accept:
+    // if the length is greater than 0, update the last byte to be a null byte
+    CMPQ    CX, $0                   // Check if the length is 0
+    JLE     done                     // If it is, we are done
+    MOVB    $0, (SI)                 // Copy a null byte to the current SI position
+    INCQ    SI                       // Increment the destination pointer
+    JMP     accept                   // Jump back to accept
 
 done:
-fill_nulls:
-    CMPQ   SI, DX              // Compare the destination pointer to the end of the slice
-    JGE     finish              // If the destination pointer is greater than or equal to the end of the slice, jump to finish
+    RET
 
-    MOVB    $0, (SI)            // Copy a null byte to the current SI position
-    INCQ    SI                  // Increment the destination pointer
-    JMP     fill_nulls          // Jump to fill_nulls
-
-
-
-finish:
+// Error state
+error:
+    XORQ    AX, AX                   // Clear AX to indicate error
+    MOVB    $0, (SI)                 // Copy a null byte to the current SI position
     RET

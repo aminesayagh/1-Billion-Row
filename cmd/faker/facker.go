@@ -69,10 +69,10 @@ func main() {
 	fmt.Println("Generating weather data...")
 
 	batch := make([]any, 0, batchSize)
-	for i := 1; i <= rows; i++ {
+	for i := 1; i < rows; i++ {
 		station := stations[rand.Intn(len(stations))] // Randomly select a station
 		temperature := generateTemperature() 		// Generate a random temperature
-		batch = append(batch, fmt.Sprintf("%s;%.1f\n", station, temperature)) // Append the data to the batch
+		batch = append(batch, fmt.Sprintf("%s;%.2f\n", station, temperature)) // Append the data to the batch
 
 		// If the batch is full, write it to the file
 		if i%batchSize == 0 { // Write the batch to the file
