@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "alloc",
+    "automator",
     "bufio",
     "Burkina",
     "byteutil",
@@ -15,6 +16,7 @@
     "Procs",
     "Rica",
     "SAYAGH",
+    "SIMD",
     "stddev",
     "textflag"
   ],
