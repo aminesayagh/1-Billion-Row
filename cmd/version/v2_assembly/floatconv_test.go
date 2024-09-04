@@ -32,51 +32,61 @@ func TestBytesToNumericBytes(t *testing.T) {
 			expected: []byte{'-', 4, 2},
 		},
 		{
+			name:     "Positive number with leading spaces before the number",
+			input:    []byte("  123"),
+			expected: []byte{1, 2, 3, 59, 59},
+		},
+		{
+			name:     "Positive number with trailing spaces after the number",
+			input:    []byte("123  "),
+			expected: []byte{1, 2, 3, 59, 59},
+		},
+		{
 			name:     "Positive number with leading and trailing spaces",
 			input:    []byte("  123  "),
-			expected: []byte{1, 2, 3, 32, 32, 32, 32},
+			expected: []byte{1, 2, 3, 59, 59, 59, 59},
 		},
 		{
 			name:     "Mixed characters with number",
 			input:    []byte("abc123def"),
-			expected: []byte{1, 2, 3, 32, 32, 32, 32},
+			expected: []byte{1, 2, 3, 59, 59, 59, 59, 59, 59},
 		},
-		// {
-		// 	name:     "Decimal only",
-		// 	input:    []byte("."),
-		// 	expected: []byte{'.'},
-		// },
-		// {
-		// 	name:     "Empty input",
-		// 	input:    []byte(""),
-		// 	expected: []byte{},
-		// },
-		// {
-		// 	name:     "Negative number with leading and trailing spaces",
-		// 	input:    []byte("  -123  "),
-		// 	expected: []byte{'-', 1, 2, 3, 0, 0, 0, 0},
-		// },
-		// {
-		// 	name:     "Negative number with leading and trailing spaces and decimals",
-		// 	input:    []byte("  -123.45  "),
-		// 	expected: []byte{'-', 1, 2, 3, '.', 4, 5},
-		// },
-		// {
-		// 	name:    "Last characters are a '.'",
-		// 	input:   []byte("123."),
-		// 	expected: []byte{1, 2, 3},
-		// },
+		{
+			name:     "Decimal only",
+			input:    []byte("."),
+			expected: []byte{59},
+		},
+		{
+			name:     "Empty input",
+			input:    []byte(""),
+			expected: []byte{},
+		},
+		{
+			name:     "Negative number with leading and trailing spaces",
+			input:    []byte("  -123  "),
+			expected: []byte{'-', 1, 2, 3, 59, 59, 59, 59},
+		},
+		{
+			name:     "Negative number with leading and trailing spaces and decimals",
+			input:    []byte("  -123.45  "),
+			expected: []byte{'-', 1, 2, 3, '.', 4, 5, 59, 59, 59, 59},
+		},
+		{
+			name:    "Last characters are a '.'",
+			input:   []byte("123."),
+			expected: []byte{1, 2, 3},
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Logf("Input: %v", tc.input)
+			t.Logf("Input: %v, with value: `%s`", tc.input, tc.input)
 			BytesToNumericBytes(tc.input) 
 			
 			if !reflect.DeepEqual(tc.input, tc.expected) {
-				t.Errorf("Expected %v, but got %v", tc.expected, tc.input)
+				t.Errorf("Expected %v, but got %v on a long %v", tc.expected, tc.input, len(tc.input))
 			} else {
-				t.Logf("Expected %v, and got %v", tc.expected, tc.input)
+				t.Logf("Expected %v, and got %v on a long %v", tc.expected, tc.input, len(tc.input))
 			}
 		})
 	}

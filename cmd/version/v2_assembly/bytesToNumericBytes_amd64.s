@@ -6,11 +6,14 @@ TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0
     MOVQ    DX, SI                   // SI will be our destination pointer for valid bytes
     XORQ    AX, AX                   // Clear AX to indicate no errors
 
+    LEAQ    -1(DX)(CX*1), DI         // DI = DX + CX - 1 (point to the last byte of the array)
+
     MOVQ    $0, BX                   // Set initial state to q0
 
 main_loop:
     CMPQ    CX, $0                   // Check if the length is 0
     JLE     accept                   // If it is, we are done
+    
 
     // Load the next state based on the value in BX, ordered by the most common used states
     CMPQ    BX, $0                   // If BX == 0, jump to q0
@@ -38,7 +41,7 @@ q0:
     JL      q0_less_than_one         // If less than '1', jump to q0_less_than_one
 
     CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error_invalid_char       // If greater than '9', jump to error
+    JG      skip_char                // If greater than '9', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
     JMP     set_state_q1              // Process the character
@@ -57,10 +60,11 @@ q0:
     CMPB    AL, $'+'                 // Check if AL is '+'
     JE      set_state_q2             // If equal, jump to q2
 
+    
     JMP     skip_char                // If we get here, we are in an invalid state
 
     set_state_q2:
-    // save the sign character
+    // save the sign character 
     MOVB    AL, (SI)                 // Store the sign character
     MOVQ    $2, BX                   // Set state to q2
     JMP     process                  // Process the character
@@ -72,7 +76,7 @@ q1:
     JL      q1_less_than_zero        // If less than '0', jump to less_than_zero
 
     CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error_invalid_char       // If greater than '9', jump to error
+    JG      skip_char                // If greater than '9', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
     JMP     set_state_q1              // Process the character
@@ -80,6 +84,9 @@ q1:
     q1_less_than_zero:
     CMPB    AL, $'.'                 // Check if AL is '.'
     JE      set_state_q4             // If equal, jump to q4
+
+    CMPB    AL, $' '                 // If we get here, we are in an invalid state
+    JE      skip_char                // If equal, jump to error
 
 set_state_q1:
     MOVQ    $1, BX                   // Set state to q1
@@ -96,7 +103,7 @@ q2:
     JL      error_unexpected_decimal // If less than '0', jump to error
 
     CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error_invalid_char       // If greater than '9', jump to error
+    JG      skip_char                // If greater than '9', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
 
@@ -129,7 +136,7 @@ q4:
     JL      q4_less_than_one         // If less than '1', jump to q4_less_than_one
 
     CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error_invalid_char       // If greater than '9', jump to error
+    JG      skip_char                // If greater than '9', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
     JMP     set_state_q5             // Process the character
@@ -153,14 +160,14 @@ q5:
     JL      q5_less_than_one         // If less than '1', jump to q5_less_than_one
 
     CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error_invalid_char       // If greater than '9', jump to error
+    JG      skip_char                // If greater than '9', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
     JMP     set_state_q5              // Process the character
 
     q5_less_than_one:
     CMPB    AL, $'0'                 // Check if AL is '0'
-    JNE     error_unexpected_decimal // If less than '0', jump to error
+    JNE     skip_char                // If less than '0', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
     MOVQ    $6, BX                   // Set state to q6
@@ -173,7 +180,7 @@ q6:
     JL      q6_less_than_one         // If less than '1', jump to q6_less_than_one
 
     CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error_invalid_char       // If greater than '9', jump to error
+    JG      skip_char                // If greater than '9', jump to error
 
     SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
     MOVQ    $6, BX                   // Set state to q6
@@ -187,29 +194,30 @@ q6:
     JMP     set_state_q5             // Jump to q5
 
 process:
+    CMPQ    SI, DI                   // Check if SI (valid char pointer) reaches DI (invalid char pointer)
+    JG     done                     // If SI >= DI, we're done
     MOVB    AL, (SI)                 // Store the numeric value
     INCQ    SI                       // Move the destination pointer
     INCQ    DX                       // Move the source pointer
     DECQ    CX                       // Decrement the length
+    
     JMP     main_loop                // Continue the loop
 
 skip_char:
+    CMPQ    SI, DI                   // Check if SI reaches DI
+    JG     done                     // If SI >= DI, we're done
+
+    MOVB    $59, (DI)                // Store the invalid character
+    DECQ    DI                       // Move the destination pointer
     INCQ    DX                       // Move the source pointer
     DECQ    CX                       // Decrement the length
     JMP     main_loop                // Continue the loop
 
 accept:
     CMPQ    CX, $0                   // Check if the length is 0
-    JE      done                     // If it is, we are done
-    MOVB    $0, (SI)                 // Store the null character
-    INCQ    SI                       // Move the destination pointer
-    INCQ    DX                       // Move the source pointer
-    DECQ    CX                       // Decrement the length
-    JMP     accept                   // We are done
+    JNE     error_invalid_char       // If it is not, we are done
 
 done:
-    MOVQ    SI, ret+16(FP)           // Store the new length of the byte slice
-    MOVQ    AX, ret+24(FP)           // Store the error code
     RET
 
 error_invalid_char: // code -1 is 255 in uint8
