@@ -1,16 +1,26 @@
 {
-    "cSpell.words": [
-        "alloc",
-        "bufio",
-        "Burkina",
-        "byteutil",
-        "Faso",
-        "Goroutines",
-        "mapstruct",
-        "Príncipe",
-        "Println",
-        "Procs",
-        "Rica",
-        "stddev"
-    ]
+  "cSpell.words": [
+    "alloc",
+    "automator",
+    "bufio",
+    "Burkina",
+    "byteutil",
+    "Faso",
+    "Goroutines",
+    "mapstruct",
+    "MOVZX",
+    "networkx",
+    "NOSPLIT",
+    "Príncipe",
+    "Println",
+    "Procs",
+    "Rica",
+    "SAYAGH",
+    "SIMD",
+    "stddev",
+    "textflag"
+  ],
+  "files.associations": {
+    "*.s": "asm"
+  },
 }

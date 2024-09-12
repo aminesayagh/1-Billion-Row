@@ -225,6 +225,14 @@ In this stage, the parsing solution is a simple one threaded solution, we took o
 - System memory used: 67.19 MB.
 - Heap memory used: 46.02 MB.
 
+### Stage 2: Assembly Parsing Solution
+
+#### Stage 2: Points considered
+
+- Use of Assembly to parse the data.
+- Structure the implementation of a Automat of float processing (see the `cmd/version/v2_assembly/automator/README.md` readme).
+- (X) Use of SIMD (Single Instruction, Multiple Data) instructions to parse the data (abandoned due to the complexity of the implementation).
+
 ## Resume
 
 | Stage                   | Execution Time    | Total Memory Allocated |

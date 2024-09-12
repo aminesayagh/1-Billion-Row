@@ -51,10 +51,10 @@ var stations = []string{
 func generateTemperature() float64 {
 	mean := 15.0
 	stddev := 30.0
-	u1 := rand.Float64()
-	u2 := rand.Float64()
-	z0 := math.Sqrt(-2.0*math.Log(u1)) * math.Cos(2.0*math.Pi*u2)
-	return mean + z0*stddev
+	u1 := rand.Float64() // Generate a random number between 0 and 1
+	u2 := rand.Float64() // Generate a random number between 0 and 1
+	z0 := math.Sqrt(-2.0*math.Log(u1)) * math.Cos(2.0*math.Pi*u2) // Box-Muller transform, generates a random number from a normal distribution, 
+	return mean + z0*stddev // Return the temperature
 }
 
 func main() {
@@ -69,10 +69,10 @@ func main() {
 	fmt.Println("Generating weather data...")
 
 	batch := make([]any, 0, batchSize)
-	for i := 1; i <= rows; i++ {
+	for i := 1; i < rows; i++ {
 		station := stations[rand.Intn(len(stations))] // Randomly select a station
 		temperature := generateTemperature() 		// Generate a random temperature
-		batch = append(batch, fmt.Sprintf("%s;%.1f\n", station, temperature)) // Append the data to the batch
+		batch = append(batch, fmt.Sprintf("%s;%.2f\n", station, temperature)) // Append the data to the batch
 
 		// If the batch is full, write it to the file
 		if i%batchSize == 0 { // Write the batch to the file

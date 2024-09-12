@@ -63,9 +63,13 @@ go mod tidy
 # Install the Go packages
 go install
 
+# Build the Go packages
+go build -o exec
+
 # Test the Go packages with verbose output, 
 # go test -v ./...
 
 # Run the main.go file
-go run main.go
+# go run main.go
+./exec
 
