@@ -7,7 +7,7 @@ This automaton is designed to minimize the number of states and transitions on t
 The regular expression for a floating-point number is defined as follows:
 
 ```bash
-(+|-)?([1,9][0,9]*\.[0,9]+[1,9]*)
+^[+-]?(0|[1-9][0-9]*)\.[0-9]*[1-9]$
 ```
 
 ## branch shaft
@@ -15,39 +15,79 @@ The regular expression for a floating-point number is defined as follows:
 The branch shaft is the most common path that the automaton follows to parse a floating-point number.
 
 ```bash
-E -> +T | -T | T
-T -> 1..9D
-D -> 0..9D | .F
-F -> 0Z | 1..9Z
-Z -> 0Z | 1..9Z | ε
+E  -> [+-]? N
+N  -> I '.' F
+I  -> '0' | [1-9][0-9]*
+F  -> [0-9]* [1-9]
+
 ```
 
 ## States and Transitions of the finite Automaton
 
 ### States
 
-- **q0 (Init):** The initial state where the automaton begins processing.
-- **q1 (Integer Part):** Processes digits that form the integer part of the number.
-- **q2 (Sign):** Handles the optional sign (`+` or `-`) of the number.
-- **q3 (Decimal Point):** Represents the transition to the fractional part.
-- **q4 (Fractional Part):** Processes digits after the decimal point.
-- **q5 (Leading Zero in Fraction):** Processes the initial `0` in the fractional part.
-- **q6 (Accept):** The final state , indicating a valid floating-point number.
+- **q0 (Init):** Initial state.
+- **q1 (Sign):** After reading an optional sign (`+` or `-`).
+- **q2 (Integer Zero):** After reading `0` as the integer part.
+- **q3 (Integer No-Zero):** While reading digits in the integer part.
+- **q4 (Decimal Point):** After reading the decimal point `.`.
+- **q5 (Fractional Part):** While reading zeros in the fractional part.
+- **q6 (Fractional No-Zero):** After reading a non-zero digit in the fractional part.
+- **q_accept (Accept):** Accepting state.
+- **q_error (Error):** Rejecting state.
 
-### Transitions
+### State Transitions
 
-- **q0 -> q2:** On input `+` or `-`, the automaton transitions from `q0` to `q2`.
-- **q0 -> q1:** On input `1..9`, the automaton transitions from `q0` to `q1`.
-- **q2 -> q1:** On input `1..9`, the automaton transitions from `q2` to `q1`.
-- **q1 -> q1:** On input `0..9`, the automaton remains in `q1` (loop for multiple digits).
-- **q1 -> q3:** On input `.`, the automaton transitions from `q1` to `q3`.
-- **q3 -> q5:** On input `0`, the automaton transitions from `q3` to `q5`.
-- **q3 -> q4:** On input `1..9`, the automaton transitions from `q3` to `q4`.
-- **q5 -> q5:** On input `0..9`, the automaton remains in `q5`.
-- **q5 -> q4:** On input `1..9`, the automaton transitions from `q5` to `q4`.
-- **q4 -> q5:** On input `0`, the automaton transitions from `q4` back to `q5`.
-- **q4 -> q4:** On input `1..9`, the automaton remains in `q4`.
-- **q4 -> q6:** On input [accepting condition], the automaton transitions to the accepting state `q6`.
+- **q0 (Initial):**
+  - On `+` or `-` → `q1`
+  - On `0` → `q2`
+  - On `[1-9]` → `q3`
+  - Else → `q_error`
+
+- **q1 (Sign):**
+  - On `0` → `q2`
+  - On `[1-9]` → `q3`
+  - Else → `q_error`
+
+- **q2 (Integer Zero):**
+  - On `.` → `q4`
+  - Else → `q_error`
+
+- **q3 (Integer No-Zero):**
+  - On `[0-9]` → `q3` (loop to consume integer digits)
+  - On `.` → `q4`
+  - Else → `q_error`
+
+- **q4 (Decimal Point):**
+  - On `0` → `q5`
+  - On `[1-9]` → `q6`
+  - Else → `q_error`
+
+- **q5 (Fractional Zeroes):**
+  - On `0` → `q5` (remain in `q5`)
+  - On `[1-9]` → `q6`
+  - On end of input → `q_error` (cannot end with zero)
+  - Else → `q_error`
+
+- **q6 (Fractional Non-Zero):**
+  - On `[0-9]` → `q6` (consume fractional digits)
+  - On end of input → `q_accept`
+  - Else → `q_error`
+
+- **q_accept (Accept):**
+  - Input is accepted.
+
+- **q_error (Error):**
+  - Input is rejected; any input remains in `q_error`.
+
+### Most Common Parsing Path
+
+For performance optimization, we focus on the most common parsing path through the automaton, which is:
+
+```bash
+q0 → q3 → q3 → q4 → q6 → q_accept
+q0 -> q1 -> q3 -> q3 -> q4 -> q6 -> q_accept # with sign '-'
+```
 
 ### Diagram
 

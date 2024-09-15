@@ -22,6 +22,11 @@ func TestBytesToNumericBytes(t *testing.T) {
 			expected: []byte{'-', 1, 2, 3, '.', 4, 5},
 		},
 		{
+			name:    "Positive integer with decimals",
+			input:   []byte("+123.45"),
+			expected: []byte{1, 2, 3, '.', 4, 5, 59},
+		},
+		{
 			name:     "Positive integer",
 			input:    []byte("6789"),
 			expected: []byte{6, 7, 8, 9},
@@ -74,6 +79,16 @@ func TestBytesToNumericBytes(t *testing.T) {
 		{
 			name:    "Last characters are a '.'",
 			input:   []byte("123."),
+			expected: []byte{1, 2, 3},
+		},
+		{
+			name:    "Last characters are a '.' with leading spaces",
+			input:   []byte("  123."),
+			expected: []byte{1, 2, 3, 59, 59},
+		},
+		{
+			name:    "Last characters are a '.' with trailing spaces",
+			input:   []byte("123.  "),
 			expected: []byte{1, 2, 3},
 		},
 	}
