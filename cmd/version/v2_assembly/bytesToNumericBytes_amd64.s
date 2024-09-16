@@ -8,7 +8,7 @@ TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0
     // DI: Pointer to the last byte in the input slice
     // BX: Current state of the automaton
     // AX: Error code
-    // R8: Flag to track if the last fractional digit was non-zero
+    // R8: Counter for skipped characters
 
     MOVQ    len+8(FP), CX            // Load the length of the byte slice into CX
     MOVQ    b+0(FP), DX              // Load the pointer to the byte slice into DX
@@ -16,6 +16,7 @@ TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0
     XORQ    AX, AX                   // Clear AX to indicate no errors
 
     LEAQ    -1(DX)(CX*1), DI         // DI = DX + CX - 1 (point to the last byte of the array)
+    DECQ    DI
 
     MOVQ    $0, BX                   // Set initial state to q0
 
@@ -64,7 +65,7 @@ q0:
     CMPB    AL, $'+'                 // Check if AL is '+'
     JE      skip_char             // If equal, jump to q1
 
-    JMP     error_invalid_char       // If we get here, we are in an invalid state
+    JMP     skip_char       // If we get here, we are in an invalid state
 
     set_state_q1:
     MOVQ    $1, BX                   // Set the next state to q1
@@ -191,24 +192,32 @@ q6:
     JMP     process_next_byte        // Process the next byte
 
 process_next_byte:
-    CMPQ    SI, DI                   // Check if SI (valid char pointer) reaches DI (invalid char pointer)
-    JG      done                     // If SI >= DI, we're done
     MOVB    AL, (SI)                 // Store the numeric value
     INCQ    SI                       // Move the destination pointer
     INCQ    DX                       // Move the source pointer
     DECQ    CX                       // Decrement the length
+    
+    CMPQ    SI, $59                   // Check if SI (valid char pointer) reaches DI (invalid char pointer)
+    JE      done                     // If SI >= DI, we're done
+    
+    CMPQ    CX, $0                   // Check if the length is 0
+    JNE     main_loop                // If it is not, continue the loop
 
-    JMP     main_loop                // Continue the loop
+    JMP     accept                   // If we reach the end of the input, accept the result
 
 skip_char:
-    CMPQ    SI, DI                   // Check if SI reaches DI
-    JG      done                     // If SI >= DI, we're done
-
     MOVB    $59, (DI)                // Store the invalid character
     DECQ    DI                       // Move the destination pointer
     INCQ    DX                       // Move the source pointer
     DECQ    CX                       // Decrement the length
-    JMP     main_loop                // Continue the loop
+
+    CMPQ    SI, DI                   // Check if SI reaches DI
+    JG      done                     // If SI >= DI, we're done
+
+    CMPQ    CX, $0                   // Check if the length is 0
+    JNE     main_loop                // If it is not, continue the loop
+
+    JMP     accept                   // If we reach the end of the input, accept the result
 
 accept:
     CMPQ    CX, $0                   // Check if the length is 0

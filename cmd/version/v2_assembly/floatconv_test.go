@@ -23,13 +23,13 @@ func TestBytesToNumericBytes(t *testing.T) {
 		},
 		{
 			name:    "Positive integer with decimals",
-			input:   []byte("+123.45"),
+			input:   []byte("   +123.45"),
 			expected: []byte{1, 2, 3, '.', 4, 5, 59},
 		},
 		{
 			name:     "Positive integer",
-			input:    []byte("6789"),
-			expected: []byte{6, 7, 8, 9},
+			input:    []byte("6789."),
+			expected: []byte{6, 7, 8, 9, '.'},
 		},
 		{
 			name:     "Negative integer",
@@ -93,6 +93,7 @@ func TestBytesToNumericBytes(t *testing.T) {
 		},
 	}
 
+	
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Logf("Input: %v, with value: `%s`", tc.input, tc.input)
