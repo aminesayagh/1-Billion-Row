@@ -1,181 +1,244 @@
 #include "textflag.h"
 
 TEXT ·BytesToNumericBytes(SB), NOSPLIT, $0
+    // Register Usage:
+    // CX: Length of the input byte slice
+    // DX: Pointer to the current byte in the input slice
+    // SI: Pointer to the output buffer for valid bytes
+    // BX: Current state of the automaton
+    // AX: Error code
+
     MOVQ    len+8(FP), CX            // Load the length of the byte slice into CX
     MOVQ    b+0(FP), DX              // Load the pointer to the byte slice into DX
-    MOVQ    DX, SI                   // SI will be our destination pointer for valid bytes
+    MOVQ    o+16(FP), SI             // Load the pointer to the output buffer into SI
     XORQ    AX, AX                   // Clear AX to indicate no errors
 
     MOVQ    $0, BX                   // Set initial state to q0
 
 main_loop:
-    CMPQ    CX, $0                   // Check if the length is 0
-    JLE     accept                   // If it is, we are done
-
-    // Load the next state based on the value in BX
     CMPQ    BX, $0                   // If BX == 0, jump to q0
     JE      q0
-    CMPQ    BX, $1                   // If BX == 1, jump to q1
-    JE      q1
-    CMPQ    BX, $2                   // If BX == 2, jump to q2
-    JE      q2
     CMPQ    BX, $3                   // If BX == 3, jump to q3
     JE      q3
-    CMPQ    BX, $4                   // If BX == 4, jump to q3
+    CMPQ    BX, $1                   // If BX == 1, jump to q1
+    JE      q1
+    CMPQ    BX, $4                   // If BX == 4, jump to q4
     JE      q4
-    CMPQ    BX, $5                   // If BX == 5, jump to q4
-    JE      q5
     CMPQ    BX, $6                   // If BX == 6, jump to q6
     JE      q6
-    CMPQ    BX, $7                   // If BX == 7, jump to q7
-    JE      q7
-    
-    JMP     error                    // If we get here, we are in an invalid state
+    CMPQ    BX, $5                   // If BX == 5, jump to q5
+    JE      q5
+    CMPQ    BX, $2                   // If BX == 2, jump to q2
+    JE      q2
 
-// State q0
+    JMP     error_invalid_state      // If in an invalid state, jump to error
+
+// State q0: Initial state
 q0:
     MOVB    (DX), AL                 // Load the current byte into AL
-    
-    CMPB    AL, $'1'                 // Check if AL is '1'
-    JL      less_than_one         // If less than '1', jump to greater_than_one
 
-    CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error                    // If greater than '9', jump to error
+    CMPB    AL, $' '                 // Check if AL is a space
+    JE      skip_char                // If space, skip it
 
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    MOVQ    $1, BX                   // Set state to q1
-    JMP     process                  // Process the character
+    CMPB    AL, $'1'                 // Check if AL >= '1'
+    JB      q0_check_zero            // If AL < '1', jump to q0_check_zero
 
-    less_than_one:
-    CMPB    AL, $'0'                 // Check if AL is '0'
-    JNE     char_sign                // If less than '0', jump to less_than_zero
+    CMPB    AL, $'9'                 // Check if AL > '9'
+    JA      skip_char                // If AL > '9', skip the character
 
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    JMP     set_state_q3             // Jump to q3
+    JMP     set_state_q3             // If '1' <= AL <= '9', transition to q3
 
-    char_sign:
+q0_check_zero:
+    CMPB    AL, $'0'                 // Check if AL == '0'
+    JE      set_state_q2             // If AL == '0', transition to q2
+
     CMPB    AL, $'-'                 // Check if AL is '-'
-    JE      set_state_q2             // If equal, jump to q2
+    JE      set_state_q1             // If '-', transition to q1
 
     CMPB    AL, $'+'                 // Check if AL is '+'
-    JE      set_state_q2             // If equal, jump to q2
+    JE      set_state_q1             // If '+', transition to q1
 
-    JMP     error                    // If we get here, we are in an invalid state
+    JMP     skip_char                // If invalid character, skip it
+
+set_state_q1:
+    MOVQ    $1, BX                   // Set the next state to q1
+    JMP     process_next_byte        // Process the next byte
 
 set_state_q2:
-    MOVQ    $2, BX                   // Set state to q2
-    JMP     process                  // Process the character
+    MOVQ    $2, BX                   // Set the next state to q2
+    JMP     process_next_byte        // Process the next byte
 
 set_state_q3:
-    MOVQ    $3, BX                   // Set state to q3
-    JMP     process                  // Process the '.' character
+    SUBB    $'0', AL                 // Convert ASCII to numeric value ('1'-'9' to 1-9)
+    MOVB    AL, (SI)                 // Store the digit
+    INCQ    SI                       // Move the output pointer
+    INCQ    DX                       // Move the input pointer
+    DECQ    CX                       // Decrement the input length
+    JMP     main_loop                // Continue processing
 
-// State q1
+// State q1: Sign state
 q1:
-    MOVB    (DX), AL                 // Load the next byte
+    MOVB    (DX), AL                 // Load the current byte into AL
 
-    CMPB    AL, $'.'                 // Check if it's a decimal point
-    JE      set_state_q4             // Jump to q3 if it is
+    CMPB    AL, $' '                 // Allow spaces after sign
+    JE      skip_char                // If space, skip it
 
-    CMPB    AL, $'0'                 // Compare AL to '0'
-    JL      error                    // If less than '0', jump to error
+    CMPB    AL, $'1'                 // Check if AL >= '1'
+    JB      q1_check_zero            // If AL < '1', jump to q1_check_zero
 
-    CMPB    AL, $'9'                 // Compare AL to '9'
-    JG      error                    // If greater than '9', jump to error
-    
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    MOVQ    $1, BX                   // Stay in state q1
-    JMP     process                  // Process the character
+    CMPB    AL, $'9'                 // Check if AL > '9'
+    JA      skip_char                // If AL > '9', skip the character
+
+    JMP     set_state_q3             // If '1' <= AL <= '9', transition to q3
+
+q1_check_zero:
+    CMPB    AL, $'0'                 // Check if AL == '0'
+    JE      set_state_q2             // If AL == '0', transition to q2
+
+    JMP     skip_char                // If invalid character, skip it
+
+// State q2: After reading '0' as integer part
+q2:
+    MOVB    (DX), AL                 // Load the current byte into AL
+
+    CMPB    AL, $' '                 // Allow spaces after '0'
+    JE      skip_char                // If space, skip it
+
+    CMPB    AL, $'.'                 // Check if AL is '.'
+    JE      set_state_q4             // If '.', transition to q4
+
+    JMP     skip_char                // If invalid character, skip it
 
 set_state_q4:
-    MOVQ    $4, BX                   // Set state to q4
-    JMP     process                  // Process the character
+    MOVQ    $4, BX                   // Set the next state to q4
+    JMP     process_next_byte        // Process the next byte
 
-
-// State q2
-q2:
-    MOVB    (DX), AL                 // Load the next byte
-
-    CMPB    AL, $'0'                 // Compare AL to '0'
-    JL      error                    // If less than '0', jump to error
-
-    CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error                    // If greater than '9', jump to error
-
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    MOVQ    $1, BX                   // Set state to q1
-    JMP     process                  // Process the character
-    
-// State q3
+// State q3: Integer Non-Zero state
 q3:
-    MOVB    (DX), AL                 // Load the next byte
+    MOVB    (DX), AL                 // Load the current byte into AL
 
-    
-// State q4
+    CMPB    AL, $' '                 // Allow spaces after digits
+    JE      skip_char                // If space, skip it
+
+    CMPB    AL, $'0'                 // Check if AL >= '0'
+    JB      skip_char                // If AL < '0', skip it
+
+    CMPB    AL, $'9'                 // Check if AL > '9'
+    JA      skip_char                // If AL > '9', skip the character
+
+    SUBB    $'0', AL                 // Convert ASCII to numeric value
+    MOVB    AL, (SI)                 // Store the digit
+    INCQ    SI                       // Move the output pointer
+    INCQ    DX                       // Move the input pointer
+    DECQ    CX                       // Decrement the input length
+    JMP     main_loop                // Continue processing
+
+// State q4: Decimal point state
 q4:
-    MOVB    (DX), AL                 // Load the next byte
-    CMPB    AL, $'0'                 // Check if AL is '0'
-    JE      set_state_q5             // Jump to q5 if it is
+    MOVB    (DX), AL                 // Load the current byte into AL
 
-    CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error                    // If greater than '9', jump to error
+    CMPB    AL, $' '                 // Allow spaces after decimal point
+    JE      skip_char                // If space, skip it
 
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    MOVQ    $5, BX                   // Set state to q5
-    JMP     process                  // Process the character
+    CMPB    AL, $'0'                 // Check if AL >= '0'
+    JB      skip_char                // If AL < '0', skip it
 
-set_state_q5:
-    MOVQ    $5, BX                   // Set state to q5
-    JMP     process                  // Process the character
+    CMPB    AL, $'9'                 // Check if AL > '9'
+    JA      skip_char                // If AL > '9', skip the character
 
-// State q4
-q4:
-    MOVB    (DX), AL                 // Load the next byte
-    CMPB    AL, $'0'                 // Check if AL is '0'
-    JE      set_state_q5             // Jump to q5 if it is
+    SUBB    $'0', AL                 // Convert ASCII to numeric value
+    MOVB    AL, (SI)                 // Store the digit
+    INCQ    SI                       // Move the output pointer
+    INCQ    DX                       // Move the input pointer
+    DECQ    CX                       // Decrement the input length
+    MOVQ    $6, BX                   // Transition to q6 (Fractional Non-Zero)
+    JMP     main_loop                // Continue processing
 
-    CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error                    // If greater than '9', jump to error
-
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    MOVQ    $4, BX                   // Stay in state q4
-    JMP     process                  // Process the character
-
-// State q5
+// State q5: Fractional state (handling multiple decimals)
 q5:
-    MOVB    (DX), AL                 // Load the next byte
-    CMPB    AL, $'0'                 // Check if AL is '0'
-    JE      q5                       // Stay in state q5 if it is
+    MOVB    (DX), AL                 // Load the current byte into AL
 
-    CMPB    AL, $'9'                 // Check if AL is greater than '9'
-    JG      error                    // If greater, jump to error
+    CMPB    AL, $' '                 // Allow spaces after decimal digits
+    JE      skip_char                // If space, skip it
 
-    SUBB    $'0', AL                 // Subtract '0' from AL to get the numeric value
-    MOVQ    $4, BX                   // Set state to q4
-    JMP     process                  // Process the character
+    CMPB    AL, $'0'                 // Check if AL >= '0'
+    JB      skip_char                // If AL < '0', skip it
 
-// Common Processing Code
-process:
-    MOVB    AL, (SI)                 // Copy the valid character to the current SI position
-    INCQ    SI                       // Increment the destination pointer
-    INCQ    DX                       // Increment the source pointer
-    DECQ    CX                       // Decrement the length
-    JMP     main_loop                // Jump back to main loop
+    CMPB    AL, $'9'                 // Check if AL > '9'
+    JA      skip_char                // If AL > '9', skip the character
 
-// Accept state
-accept:
-    // if the length is greater than 0, update the last byte to be a null byte
-    CMPQ    CX, $0                   // Check if the length is 0
-    JLE     done                     // If it is, we are done
-    MOVB    $0, (SI)                 // Copy a null byte to the current SI position
-    INCQ    SI                       // Increment the destination pointer
-    JMP     accept                   // Jump back to accept
+    SUBB    $'0', AL                 // Convert ASCII to numeric value
+    MOVB    AL, (SI)                 // Store the digit
+    INCQ    SI                       // Move the output pointer
+    INCQ    DX                       // Move the input pointer
+    DECQ    CX                       // Decrement the input length
+    MOVQ    $6, BX                   // Transition to q6 (Fractional Non-Zero)
+    JMP     main_loop                // Continue processing
 
-done:
+// State q6: Fractional Non-Zero
+q6:
+    MOVB    (DX), AL                 // Load the current byte into AL
+
+    CMPB    AL, $' '                 // Allow spaces after fractional digits
+    JE      skip_char                // If space, skip it
+
+    CMPB    AL, $'0'                 // Check if AL >= '0'
+    JB      skip_char                // If AL < '0', skip it
+
+    CMPB    AL, $'9'                 // Check if AL > '9'
+    JA      skip_char                // If AL > '9', skip the character
+
+    SUBB    $'0', AL                 // Convert ASCII to numeric value
+    MOVB    AL, (SI)                 // Store the digit
+    INCQ    SI                       // Move the output pointer
+    INCQ    DX                       // Move the input pointer
+    DECQ    CX                       // Decrement the input length
+    JMP     main_loop                // Continue processing
+
+// Process the next byte
+process_next_byte:
+    // No additional processing needed here
+    JMP     main_loop                // Continue to the main loop
+
+// Skip invalid or non-numeric character (like spaces)
+skip_char:
+    INCQ    DX                       // Move the input pointer
+    DECQ    CX                       // Decrement the input length
+    JMP     main_loop                // Continue processing
+
+// Handle invalid state
+error_invalid_state:
+    JMP     error_invalid_char       // Jump to error handler
+
+// Handle invalid characters
+error_invalid_char: // code -1 is 255 in uint8
+    MOVQ    $-1, AX                  // Set error code for invalid character
+    JMP     save_error
+
+error_unexpected_decimal: // code -3 is 253 in uint8
+    MOVQ    $-3, AX                  // Set error code for unexpected decimal point
+    JMP     save_error
+
+error_multiple_decimals: // code -4 is 252 in uint8
+    MOVQ    $-4, AX                  // Set error code for multiple decimal points
+    JMP     save_error
+
+save_error:
+    // Optionally handle error storage here
     RET
 
-// Error state
-error:
-    XORQ    AX, AX                   // Clear AX to indicate error
-    MOVB    $0, (SI)                 // Copy a null byte to the current SI position
+// Accept the input
+accept:
+    CMPQ    CX, $0                   // Ensure all input has been processed
+    JNE     error_invalid_char       // If not, it's an error
+
+    CMPQ    BX, $6                   // Check if in state q6 (Fractional Non-Zero)
+    JE      done                     // If yes, accept
+
+    CMPQ    BX, $3                   // Check if in state q3 (Integer Non-Zero)
+    JE      done                     // If yes, accept
+
+    JMP     error_invalid_char       // Else, it's an error
+
+done:
     RET

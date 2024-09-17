@@ -20,7 +20,7 @@ type Measurement struct {
 //  - Pointer: A pointer to the underlying array
 //  - Length: The length of the slice
 //  - Capacity: The maximum length the slice can reach
-func BytesToNumericBytes(b []byte) []byte
+func BytesToNumericBytes(input []byte, output []byte) int64
 // func Average(values []byte) []byte
 
 func Parsing(config *config.Config) {
