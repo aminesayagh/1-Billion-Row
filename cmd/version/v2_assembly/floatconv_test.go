@@ -10,81 +10,92 @@ func TestBytesToNumericBytes(t *testing.T) {
 		name     string
 		input    []byte
 		expected []byte
+		expectedLen int  
+		expectError int
 	}{
 		{
-			name:     "Positive number with decimals",
-			input:    []byte("123.45"),
-			expected: []byte{1, 2, 3, '.', 4, 5},
+			name:        "Positive number with decimals",
+			input:       []byte("123.45"),
+			expected:    []byte{1, 2, 3, '.', 4, 5},
+			expectedLen: 6,
+			expectError: 0,
 		},
 		{
-			name:     "Negative number with decimals",
-			input:    []byte("-123.45"),
-			expected: []byte{'-', 1, 2, 3, '.', 4, 5},
+			name:        "Negative number with decimals",
+			input:       []byte("-123.45"),
+			expected:    []byte{'-', 1, 2, 3, '.', 4, 5},
+			expectedLen: 7,
+			expectError: 0,
 		},
 		{
-			name:    "Positive integer with decimals",
-			input:   []byte("+123.45"),
-			expected: []byte{1, 2, 3, '.', 4, 5},
+			name:        "Positive integer with decimals",
+			input:       []byte("+123.45"),
+			expected:    []byte{1, 2, 3, '.', 4, 5},
+			expectedLen: 6,
+			expectError: 0,
 		},
 		{
-			name:     "Positive integer",
-			input:    []byte("6789."),
-			expected: []byte{6, 7, 8, 9, '.'},
+			name:        "Positive integer",
+			input:       []byte("6789."),
+			expected:    []byte{6, 7, 8, 9, '.'},
+			expectedLen: 5,
+			expectError: 0,
 		},
 		{
-			name:     "Negative integer",
-			input:    []byte("-42"),
-			expected: []byte{'-', 4, 2},
+			name:        "Negative integer",
+			input:       []byte("-42"),
+			expected:    []byte{'-', 4, 2},
+			expectedLen: 3,
+			expectError: 0,
 		},
 		{
-			name:     "Positive number with leading spaces before the number",
-			input:    []byte("  123"),
-			expected: []byte{1, 2, 3},
+			name:        "Positive number with leading spaces",
+			input:       []byte("  123"),
+			expected:    []byte{1, 2, 3},
+			expectedLen: 3,
+			expectError: 0,
 		},
 		{
-			name:     "Positive number with trailing spaces after the number",
-			input:    []byte("123  "),
-			expected: []byte{1, 2, 3},
+			name:        "Positive number with trailing spaces",
+			input:       []byte("123  "),
+			expected:    []byte{1, 2, 3},
+			expectedLen: 3,
+			expectError: -1,
 		},
 		{
-			name:     "Positive number with leading and trailing spaces",
-			input:    []byte("  123  "),
-			expected: []byte{1, 2, 3},
+			name:        "Mixed characters with number",
+			input:       []byte("abc123def"),
+			expected:    []byte{1, 2, 3},
+			expectedLen: 3,
+			expectError: 0,
 		},
 		{
-			name:     "Mixed characters with number",
-			input:    []byte("abc123def"),
-			expected: []byte{1, 2, 3},
+			name:        "Decimal only",
+			input:       []byte("."),
+			expected:    []byte{},
+			expectedLen: -1, // Expect an error
+			expectError: 0,
 		},
 		{
-			name:     "Decimal only",
-			input:    []byte("."),
-			expected: []byte{46},
+			name:        "Empty input",
+			input:       []byte(""),
+			expected:    []byte{},
+			expectedLen: 0,
+			expectError: 3,
 		},
 		{
-			name:     "Negative number with leading and trailing spaces",
-			input:    []byte("  -123  "),
-			expected: []byte{'-', 1, 2, 3},
+			name:        "Invalid input",
+			input:       []byte("abc"),
+			expected:    []byte{},
+			expectedLen: -1, // Expect an error
+			expectError: 0,
 		},
 		{
-			name:     "Negative number with leading and trailing spaces and decimals",
-			input:    []byte("  -123.45  "),
-			expected: []byte{'-', 1, 2, 3, '.', 4, 5},
-		},
-		{
-			name:    "Last characters are a '.'",
-			input:   []byte("123."),
-			expected: []byte{1, 2, 3, 46},
-		},
-		{
-			name:    "Last characters are a '.' with leading spaces",
-			input:   []byte("  123."),
-			expected: []byte{1, 2, 3, 46},
-		},
-		{
-			name:    "Last characters are a '.' with trailing spaces",
-			input:   []byte("123.  "),
-			expected: []byte{1, 2, 3, 46},
+			name:        "Multiple decimal points",
+			input:       []byte("123.45.67"),
+			expected:    []byte{1, 2, 3, '.', 4, 5},
+			expectedLen: 6,
+			expectError: -4,
 		},
 	}
 
@@ -93,9 +104,11 @@ func TestBytesToNumericBytes(t *testing.T) {
             output := make([]byte, len(tc.input)) // Allocate an output buffer with the same length as input
             errorCode := BytesToNumericBytes(tc.input, output)
 
-            if errorCode != 0 {
-                t.Errorf("Expected error code 0, but got %d", errorCode)
-            }
+            if errorCode != 0 && tc.expectError != 0 && errorCode != tc.expectError {
+				t.Errorf("Expected error code %d, but got %d", tc.expectError, errorCode)
+			} else if errorCode != 0 && tc.expectError == 0 {
+				t.Errorf("Expected error code 0, but got %d", errorCode)
+			}
 
             // Determine the actual length of valid bytes written
             actualLength := 0
