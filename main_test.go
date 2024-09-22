@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 	"oneBillion/config"
-	"oneBillion/cmd/version/v1_base"
+	"oneBillion/cmd/version/v2_assembly"
 )
 
 // TestMain tests the main function
@@ -19,5 +19,5 @@ func TestParsing(t *testing.T) {
 		Version:         "0.0.0",
 	}
 
-	v1base.Parsing(testConfig)
+	v2_assembly.Parsing(testConfig)
 }

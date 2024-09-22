@@ -2,93 +2,122 @@ package v2_assembly
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"oneBillion/config"
 	"os"
 	"strconv"
-	"bytes"
 )
 
 type Measurement struct {
-	Min     float64
-	Max     float64
-	Average float64
+	Min     DecimalNumber
+	Max     DecimalNumber
+	Average DecimalNumber
+    Sum     DecimalNumber
 	Count   int32
 }
 
-// []byte composite struct
-//  - Pointer: A pointer to the underlying array
-//  - Length: The length of the slice
-//  - Capacity: The maximum length the slice can reach
+// Assembly function declaration
+// BytesToNumericBytes parses the input byte slice and writes valid numeric bytes to the output slice.
+// Returns the number of bytes written or a negative error code.
 func BytesToNumericBytes(input []byte, output []byte) int
-// func Average(values []byte) []byte
 
 func Parsing(config *config.Config) {
-	// read the input file
+	// Open the input file
 	dataFile, err := os.Open(config.InputFilePath)
 	if err != nil {
 		fmt.Println("Error opening file: ", err)
 		return
 	}
-
 	defer dataFile.Close()
 
-	// file scanning logic
+	// Initialize the file scanner
 	fileScanner := bufio.NewScanner(dataFile)
 	buf := make([]byte, 0, 64*1024)    // 64 KB buffer
 	fileScanner.Buffer(buf, 1024*1024) // Up to 1 MB lines
 
+	// Initialize data structures
 	measurements := make(map[string]*Measurement, 500000)
-	temperatureCache := make(map[string]float64, 10000)
+	temperatureCache := make(map[string]DecimalNumber, 10000)
 
 	var (
-		currentLine              []byte
-		currentSepIndex          int
-		currentStation           string
-		currentTemperatureString string
-		currentTemperature       float64
-		exists                   bool
+		currentLine     []byte
+		currentSepIndex int
+		currentStation  string
+		tempBytes       []byte
+		numericBytes    []byte
+		tempKey         string
+		currentTemp     DecimalNumber
+		exists          bool
 	)
 
-	
+	// Pre-allocate buffers for processing temperatures
+	maxLineLength := 12 // Adjust based on expected maximum line length
+	tempBytes = make([]byte, maxLineLength)
+	numericBytes = make([]byte, maxLineLength)
+
 	for fileScanner.Scan() {
 		currentLine = fileScanner.Bytes()
 
-		currentSepIndex = bytes.IndexByte(currentLine, ';') // split by semicolon without memory allocation
+		currentSepIndex = bytes.IndexByte(currentLine, ';') // Split by semicolon without memory allocation
 		if currentSepIndex == -1 {
 			continue
 		}
 
+		// Extract the station as a string (key for the map)
 		currentStation = string(currentLine[:currentSepIndex])
-		currentTemperatureString = string(currentLine[currentSepIndex+1:])
 
-		if currentTemperature, exists = temperatureCache[currentTemperatureString]; !exists {
-			currentTemperature, err = strconv.ParseFloat(currentTemperatureString, 64)
-			if err != nil {
-				fmt.Println("Error parsing temperature: ", err)
+		// Extract the temperature bytes
+		tempBytes = currentLine[currentSepIndex+1:]
+
+		// Use the temperature bytes as a key for caching
+		tempKey = string(tempBytes)
+
+		if currentTemp, exists = temperatureCache[tempKey]; !exists {
+            l := len(tempBytes)
+            
+			n := BytesToNumericBytes(tempBytes, numericBytes)
+			if n < 0 {
+				fmt.Println("Error parsing temperature: ", n)
 				continue
 			}
-			temperatureCache[currentTemperatureString] = currentTemperature
+
+            // redimension numericBytes by the value of l
+
+			// Convert the numeric bytes to a float64
+            var newTemp DecimalNumber
+            newTemp.Normalize(numericBytes)
+            currentTemp = newTemp
+			temperatureCache[tempKey] = currentTemp
 		}
 
+		// Update measurements
 		if currentMeasurement, exists := measurements[currentStation]; exists {
-			if currentTemperature > currentMeasurement.Max {
-				currentMeasurement.Max = currentTemperature
+            
+			if currentTemp.Compare(currentMeasurement.Max) > 0 {
+				currentMeasurement.Max = currentTemp
 			}
-			if currentTemperature < currentMeasurement.Min {
-				currentMeasurement.Min = currentTemperature
+			if currentTemp.Compare(currentMeasurement.Min) < 0 {
+				currentMeasurement.Min = currentTemp
 			}
 			currentMeasurement.Count++
-			currentMeasurement.Average = ((currentMeasurement.Average * float64(currentMeasurement.Count - 1)) + currentTemperature) / float64(currentMeasurement.Count)
+            currentMeasurement.Sum = currentMeasurement.Sum.Add(currentTemp)
 		} else {
 			measurements[currentStation] = &Measurement{
-				Min:     currentTemperature,
-				Max:     currentTemperature,
-				Average: currentTemperature,
+				Min:     currentTemp,
+				Max:     currentTemp,
+				Average: currentTemp,
+                Sum:     currentTemp,
 				Count:   1,
 			}
 		}
 	}
+
+	if err := fileScanner.Err(); err != nil {
+		fmt.Println("Error scanning file: ", err)
+	}
+
+	// Write output to file
 	outputFile, err := os.Create(config.OutputFilePath)
 	if err != nil {
 		fmt.Println("Error creating output file: ", err)
@@ -96,12 +125,16 @@ func Parsing(config *config.Config) {
 	}
 	defer outputFile.Close()
 
-	// Write output efficiently
-	outputBuffer := bufio.NewWriterSize(outputFile, 4*1024*1024) // 64 KB buffer
-	lineBuffer := make([]byte, 0, 64)
+	outputBuffer := bufio.NewWriterSize(outputFile, 4*1024*1024) // 4 MB buffer
+	lineBuffer := make([]byte, 0, 128)
+
+    var average DecimalNumber
 
 	for station, measurement := range measurements {
-		lineBuffer = append(lineBuffer[:0], station...)
+		lineBuffer = lineBuffer[:0] // Reset line buffer
+        average = CalculateAverage(measurement.Sum, measurement.Count)
+
+		lineBuffer = append(lineBuffer, station...)
 		lineBuffer = append(lineBuffer, ';')
 		lineBuffer = strconv.AppendFloat(lineBuffer, measurement.Min, 'f', 2, 64)
 		lineBuffer = append(lineBuffer, ';')
@@ -118,6 +151,7 @@ func Parsing(config *config.Config) {
 			return
 		}
 	}
+
 	if err := outputBuffer.Flush(); err != nil {
 		fmt.Println("Error flushing output buffer:", err)
 	}

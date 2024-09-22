@@ -7,7 +7,7 @@ import (
 	"oneBillion/config"
 	"oneBillion/internal/context"
 	"oneBillion/internal/tracker"
-	"oneBillion/cmd/version/v1_base"
+	"oneBillion/cmd/version/v2_assembly"
 )
 
 
@@ -41,7 +41,7 @@ func main() {
 	dataFile = nil
 
 	tracker.Run(func() {
-		v1base.Parsing(config)
+		v2_assembly.Parsing(config)
 	})
 
 	// print the output file 10 lines for testing
