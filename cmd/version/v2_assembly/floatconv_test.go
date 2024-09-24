@@ -1,132 +1,150 @@
 package v2_assembly
 
 import (
-	"reflect" // Added reflect package used for deep equal comparison
+	"reflect"
 	"testing"
 )
 
-func TestBytesToNumericBytes(t *testing.T) {
+func TestBytesToNumericStruct(t *testing.T) {
 	testCases := []struct {
-		name     string
-		input    []byte
-		expected []byte
-		expectedLen int  
-		expectError int
+		name          string
+		input         []byte
+		expectedDigits [6]byte
+		expectedSign  byte
+		expectedScale byte
+		expectedLen   byte
+		expectError   int
 	}{
 		{
-			name:        "Positive number with decimals",
-			input:       []byte("123.45"),
-			expected:    []byte{1, 2, 3, '.', 4, 5},
-			expectedLen: 6,
-			expectError: 0,
+			name:          "Positive number with decimals",
+			input:         []byte("123.45"),
+			expectedDigits: [6]byte{1, 2, 3, 4, 5, 0},
+			expectedSign:  0,
+			expectedScale: 2,
+			expectedLen:   5,
+			expectError:   0,
 		},
 		{
-			name:        "Negative number with decimals",
-			input:       []byte("-123.45"),
-			expected:    []byte{'-', 1, 2, 3, '.', 4, 5},
-			expectedLen: 7,
-			expectError: 0,
+			name:          "Negative number with decimals",
+			input:         []byte("-123.45"),
+			expectedDigits: [6]byte{1, 2, 3, 4, 5, 0},
+			expectedSign:  255,
+			expectedScale: 2,
+			expectedLen:   5,
+			expectError:   0,
 		},
 		{
-			name:        "Positive integer with decimals",
-			input:       []byte("+123.45"),
-			expected:    []byte{1, 2, 3, '.', 4, 5},
-			expectedLen: 6,
-			expectError: 0,
+			name:          "Positive integer",
+			input:         []byte("6789"),
+			expectedDigits: [6]byte{6, 7, 8, 9, 0, 0},
+			expectedSign:  0,
+			expectedScale: 0,
+			expectedLen:   4,
+			expectError:   0,
 		},
 		{
-			name:        "Positive integer",
-			input:       []byte("6789."),
-			expected:    []byte{6, 7, 8, 9, '.'},
-			expectedLen: 5,
-			expectError: 0,
+			name:          "Negative integer",
+			input:         []byte("-42"),
+			expectedDigits: [6]byte{4, 2, 0, 0, 0, 0},
+			expectedSign:  255,
+			expectedScale: 0,
+			expectedLen:   2,
+			expectError:   0,
 		},
 		{
-			name:        "Negative integer",
-			input:       []byte("-42"),
-			expected:    []byte{'-', 4, 2},
-			expectedLen: 3,
-			expectError: 0,
+			name:          "Decimal only",
+			input:         []byte("."),
+			expectedDigits: [6]byte{},
+			expectedSign:  0,
+			expectedScale: 0,
+			expectedLen:   0,
+			expectError:   -1,
 		},
 		{
-			name:        "Positive number with leading spaces",
-			input:       []byte("  123"),
-			expected:    []byte{1, 2, 3},
-			expectedLen: 3,
-			expectError: 0,
+			name:          "Empty input",
+			input:         []byte(""),
+			expectedDigits: [6]byte{},
+			expectedSign:  0,
+			expectedScale: 0,
+			expectedLen:   0,
+			expectError:   0,
 		},
 		{
-			name:        "Positive number with trailing spaces",
-			input:       []byte("123  "),
-			expected:    []byte{1, 2, 3},
-			expectedLen: 3,
-			expectError: -1,
+			name:          "Invalid input",
+			input:         []byte("abc"),
+			expectedDigits: [6]byte{},
+			expectedSign:  0,
+			expectedScale: 0,
+			expectedLen:   0,
+			expectError:   -1,
 		},
 		{
-			name:        "Mixed characters with number",
-			input:       []byte("abc123def"),
-			expected:    []byte{1, 2, 3},
-			expectedLen: 3,
-			expectError: 0,
+			name:          "Multiple decimal points",
+			input:         []byte("123.45.67"),
+			expectedDigits: [6]byte{1, 2, 3, 4, 5, 0},
+			expectedSign:  0,
+			expectedScale: 2,
+			expectedLen:   5,
+			expectError:   -4,
 		},
 		{
-			name:        "Decimal only",
-			input:       []byte("."),
-			expected:    []byte{},
-			expectedLen: -1, // Expect an error
-			expectError: 0,
+			name:          "Multiple negative signs",
+			input:         []byte("--123.45"),
+			expectedDigits: [6]byte{1, 2, 3, 4, 5, 0},
+			expectedSign:  255,
+			expectedScale: 2,
+			expectedLen:   5,
+			expectError:   -1,
 		},
 		{
-			name:        "Empty input",
-			input:       []byte(""),
-			expected:    []byte{},
-			expectedLen: 0,
-			expectError: 3,
+			name:          "Multiple positive signs",
+			input:         []byte("++123.45"),
+			expectedDigits: [6]byte{1, 2, 3, 4, 5, 0},
+			expectedSign:  0,
+			expectedScale: 2,
+			expectedLen:   5,
+			expectError:   -1,
 		},
 		{
-			name:        "Invalid input",
-			input:       []byte("abc"),
-			expected:    []byte{},
-			expectedLen: -1, // Expect an error
-			expectError: 0,
-		},
-		{
-			name:        "Multiple decimal points",
-			input:       []byte("123.45.67"),
-			expected:    []byte{1, 2, 3, '.', 4, 5},
-			expectedLen: 6,
-			expectError: -4,
+			name: 		"Close with 0",
+			input: []byte("32.0"),
+			expectedDigits: [6]byte{3, 2, 0, 0, 0, 0},
+			expectedSign:  0,
+			expectedScale: 0,
+			expectedLen:   2,
+			expectError:   0,
 		},
 	}
 
 	for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            output := make([]byte, len(tc.input)) // Allocate an output buffer with the same length as input
-            errorCode := BytesToNumericBytes(tc.input, output)
+		t.Run(tc.name, func(t *testing.T) {
+			var digits [6]byte
+			var sign, scale, length byte
+			
+			errorCode := BytesToNumericBytes(tc.input, &digits, &sign, &scale, &length)
 
-            if errorCode != 0 && tc.expectError != 0 && errorCode != tc.expectError {
+			if errorCode != tc.expectError {
 				t.Errorf("Expected error code %d, but got %d", tc.expectError, errorCode)
-			} else if errorCode != 0 && tc.expectError == 0 {
-				t.Errorf("Expected error code 0, but got %d", errorCode)
 			}
 
-            // Determine the actual length of valid bytes written
-            actualLength := 0
-            for i := 0; i < len(output); i++ {
-                if output[i] != 0 {
-                    actualLength++
-                } else {
-                    break
-                }
-            }
+			if !reflect.DeepEqual(digits, tc.expectedDigits) {
+				t.Errorf("Expected digits %v, but got %v", tc.expectedDigits, digits)
+			}
 
-            actual := output[:actualLength]
+			if sign != tc.expectedSign {
+				t.Errorf("Expected sign %d, but got %d", tc.expectedSign, sign)
+			}
 
-            if !reflect.DeepEqual(actual, tc.expected) {
-                t.Errorf("Expected %v, but got %v", tc.expected, actual)
-            } else {
-                t.Logf("Expected %v, and got %v", tc.expected, actual)
-            }
-        })
-    }
+			if scale != tc.expectedScale {
+				t.Errorf("Expected scale %d, but got %d", tc.expectedScale, scale)
+			}
+
+			if length != tc.expectedLen {
+				t.Errorf("Expected length %d, but got %d", tc.expectedLen, length)
+			}
+
+			t.Logf("Input: %s, Digits: %v, Sign: %d, Scale: %d, Length: %d, Error: %d",
+				string(tc.input), digits, sign, scale, length, errorCode)
+		})
+	}
 }

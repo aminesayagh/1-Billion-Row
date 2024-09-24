@@ -5,22 +5,106 @@ import (
 	"bytes"
 	"fmt"
 	"oneBillion/config"
+	"io"
 	"os"
-	"strconv"
+	"sync"
 )
 
 type Measurement struct {
 	Min     DecimalNumber
 	Max     DecimalNumber
 	Average DecimalNumber
-    Sum     DecimalNumber
 	Count   int32
 }
 
 // Assembly function declaration
-// BytesToNumericBytes parses the input byte slice and writes valid numeric bytes to the output slice.
-// Returns the number of bytes written or a negative error code.
-func BytesToNumericBytes(input []byte, output []byte) int
+func BytesToNumericBytes(input []byte, digits *[6]byte, sign *byte, scale *byte, length *byte) int
+
+var bufferPool = sync.Pool{
+    New: func() interface{} {
+        return make([]byte, 0, 64)
+    },
+}
+
+var digits = [10]byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+
+func intToBytes(i int32, buf []byte) int {
+    // Handle 0 specially
+    if i == 0 {
+        buf[0] = '0'
+        return 1
+    }
+
+    // Handle negative numbers
+    var negative bool
+    if i < 0 {
+        negative = true
+        i = -i
+    }
+
+    // Convert the absolute value to bytes
+    pos := len(buf)
+    for i > 0 {
+        pos--
+        buf[pos] = digits[i%10]
+        i /= 10
+    }
+
+    // Add the negative sign if necessary
+    if negative {
+        pos--
+        buf[pos] = '-'
+    }
+
+    // Move the bytes to the beginning of the buffer
+    copy(buf, buf[pos:])
+
+    return len(buf) - pos
+}
+
+func DecimalNumberToBytes(i DecimalNumber, buf []byte) int {
+    if i.Length == 0 {
+        buf[0] = '0'
+        buf[1] = '.'
+        buf[2] = '0'
+        return 3
+    }
+
+    pos := 0
+
+    // Add negative sign if necessary
+    if i.Sign == 255 {
+        buf[pos] = '-'
+        pos++
+    }
+
+    // Add digits before decimal point
+    integerPartLength := int(i.Length) - int(i.Scale)
+    for j := 0; j < integerPartLength; j++ {
+        buf[pos] = digits[i.Digits[j]]
+        pos++
+    }
+
+    // Add decimal point if there's a fractional part
+    if i.Scale > 0 {
+        buf[pos] = '.'
+        pos++
+
+        // Add digits after decimal point
+        for j := integerPartLength; j < int(i.Length); j++ {
+            buf[pos] = digits[i.Digits[j]]
+            pos++
+        }
+    } else {
+        // If no fractional part, add ".0"
+        buf[pos] = '.'
+        buf[pos+1] = '0'
+        pos += 2
+    }
+
+    return pos
+}
+
 
 func Parsing(config *config.Config) {
 	// Open the input file
@@ -31,90 +115,73 @@ func Parsing(config *config.Config) {
 	}
 	defer dataFile.Close()
 
-	// Initialize the file scanner
-	fileScanner := bufio.NewScanner(dataFile)
-	buf := make([]byte, 0, 64*1024)    // 64 KB buffer
-	fileScanner.Buffer(buf, 1024*1024) // Up to 1 MB lines
-
-	// Initialize data structures
 	measurements := make(map[string]*Measurement, 500000)
 	temperatureCache := make(map[string]DecimalNumber, 10000)
 
+	// Initialize the file scanner
+    reader := bufio.NewReaderSize(dataFile, 64*1024) // 64 KB buffer
+
 	var (
-		currentLine     []byte
-		currentSepIndex int
-		currentStation  string
+		line     		[]byte
+		sepIndex        int
+		station  		string
 		tempBytes       []byte
-		numericBytes    []byte
-		tempKey         string
 		currentTemp     DecimalNumber
+		measurement     *Measurement
 		exists          bool
 	)
 
-	// Pre-allocate buffers for processing temperatures
-	maxLineLength := 12 // Adjust based on expected maximum line length
-	tempBytes = make([]byte, maxLineLength)
-	numericBytes = make([]byte, maxLineLength)
+	for {
+        line = bufferPool.Get().([]byte)[:0]
+        line, err = reader.ReadSlice('\n')
+        if err != nil {
+            if err == io.EOF {
+                break
+            }
+            fmt.Println("Error reading line:", err)
+            continue
+        }
 
-	for fileScanner.Scan() {
-		currentLine = fileScanner.Bytes()
-
-		currentSepIndex = bytes.IndexByte(currentLine, ';') // Split by semicolon without memory allocation
-		if currentSepIndex == -1 {
+		sepIndex = bytes.IndexByte(line, ';') // Split by semicolon without memory allocation
+		if sepIndex == -1 {
 			continue
 		}
 
-		// Extract the station as a string (key for the map)
-		currentStation = string(currentLine[:currentSepIndex])
-
-		// Extract the temperature bytes
-		tempBytes = currentLine[currentSepIndex+1:]
-
-		// Use the temperature bytes as a key for caching
-		tempKey = string(tempBytes)
+		station = string(line[:sepIndex]) // Extract the station as a string (key for the map)
+		tempBytes = line[sepIndex+1:]
+		
+        // Use the temperature bytes as a key for caching
+        tempKey := string(tempBytes)
 
 		if currentTemp, exists = temperatureCache[tempKey]; !exists {
-            l := len(tempBytes)
-            
-			n := BytesToNumericBytes(tempBytes, numericBytes)
-			if n < 0 {
-				fmt.Println("Error parsing temperature: ", n)
+            errorCode := BytesToNumericBytes(tempBytes, &currentTemp.Digits, &currentTemp.Sign, &currentTemp.Scale, &currentTemp.Length)
+
+			if errorCode  < 0 {
+				fmt.Println("Error parsing temperature: ", errorCode, " for station: ", station)
 				continue
 			}
-
-            // redimension numericBytes by the value of l
-
-			// Convert the numeric bytes to a float64
-            var newTemp DecimalNumber
-            newTemp.Normalize(numericBytes)
-            currentTemp = newTemp
-			temperatureCache[tempKey] = currentTemp
+            temperatureCache[tempKey] = currentTemp
 		}
-
 		// Update measurements
-		if currentMeasurement, exists := measurements[currentStation]; exists {
-            
-			if currentTemp.Compare(currentMeasurement.Max) > 0 {
-				currentMeasurement.Max = currentTemp
+		if measurement, exists = measurements[station]; exists {
+			if currentTemp.Compare(measurement.Max) > 0 {
+				measurement.Max = currentTemp
 			}
-			if currentTemp.Compare(currentMeasurement.Min) < 0 {
-				currentMeasurement.Min = currentTemp
+			if currentTemp.Compare(measurement.Min) < 0 {
+				measurement.Min = currentTemp
 			}
-			currentMeasurement.Count++
-            currentMeasurement.Sum = currentMeasurement.Sum.Add(currentTemp)
+			measurement.Count++
+			// measurement.Average = 
 		} else {
-			measurements[currentStation] = &Measurement{
+			measurements[station] = &Measurement{
 				Min:     currentTemp,
 				Max:     currentTemp,
 				Average: currentTemp,
-                Sum:     currentTemp,
 				Count:   1,
 			}
 		}
-	}
-
-	if err := fileScanner.Err(); err != nil {
-		fmt.Println("Error scanning file: ", err)
+        bufferPool.Put(line)
+		
 	}
 
 	// Write output to file
@@ -125,34 +192,35 @@ func Parsing(config *config.Config) {
 	}
 	defer outputFile.Close()
 
-	outputBuffer := bufio.NewWriterSize(outputFile, 4*1024*1024) // 4 MB buffer
-	lineBuffer := make([]byte, 0, 128)
+	writer := bufio.NewWriterSize(outputFile, 4*1024*1024) // 4 MB buffer
+    var buffer [256]byte // 256 bytes buffer
+	
+    for station, m := range measurements {
+        n := 0
+        n += copy(buffer[n:], station) // Copy the station name to the buffer
+        buffer[n] = ';' // Add a semicolon
+        n++
+		
+        n += DecimalNumberToBytes(m.Min, buffer[n:]) // Copy the minimum temperature to the buffer
+        buffer[n] = ';'
+        n++
+        n += DecimalNumberToBytes(m.Max, buffer[n:]) // Copy the maximum temperature to the buffer
+        buffer[n] = ';'
+        n++
+        n += DecimalNumberToBytes(m.Average, buffer[n:]) // Copy the average temperature to the buffer
+        buffer[n] = ';'
+        n++
+		n += intToBytes(m.Count, buffer[n:]) // Convert the count to bytes and copy it to the buffer
+        buffer[n] = '\n'
+        n++
 
-    var average DecimalNumber
+        if _, err := writer.Write(buffer[:n]); err != nil {
+            fmt.Println("Error writing to output file:", err)
+            return
+        }
+    }
 
-	for station, measurement := range measurements {
-		lineBuffer = lineBuffer[:0] // Reset line buffer
-        average = CalculateAverage(measurement.Sum, measurement.Count)
-
-		lineBuffer = append(lineBuffer, station...)
-		lineBuffer = append(lineBuffer, ';')
-		lineBuffer = strconv.AppendFloat(lineBuffer, measurement.Min, 'f', 2, 64)
-		lineBuffer = append(lineBuffer, ';')
-		lineBuffer = strconv.AppendFloat(lineBuffer, measurement.Max, 'f', 2, 64)
-		lineBuffer = append(lineBuffer, ';')
-		lineBuffer = strconv.AppendFloat(lineBuffer, measurement.Average, 'f', 2, 64)
-		lineBuffer = append(lineBuffer, ';')
-		lineBuffer = strconv.AppendInt(lineBuffer, int64(measurement.Count), 10)
-		lineBuffer = append(lineBuffer, '\n')
-
-		_, err := outputBuffer.Write(lineBuffer)
-		if err != nil {
-			fmt.Println("Error writing to output file:", err)
-			return
-		}
-	}
-
-	if err := outputBuffer.Flush(); err != nil {
+	if err := writer.Flush(); err != nil {
 		fmt.Println("Error flushing output buffer:", err)
 	}
 }

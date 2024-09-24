@@ -1,7 +1,6 @@
 package v2_assembly
 
 import (
-	"unsafe"
 )
 
 type DecimalNumber struct {
@@ -11,27 +10,11 @@ type DecimalNumber struct {
 	Length byte    // Number of significant digits
 }
 
-func (bn *DecimalNumber) Normalize(num []byte) {
+func (bn *DecimalNumber) init () {
+	bn.Digits = [6]byte{}
 	bn.Sign = 0
 	bn.Scale = 0
 	bn.Length = 0
-	decimalPointSeen := false
-
-	for i := 0; i < len(num) && bn.Length < 6; i++ {
-		c := num[i]
-		switch c {
-		case '-':
-			bn.Sign = 255
-		case '.':
-			decimalPointSeen = true
-		default:
-			bn.Digits[bn.Length] = c  // Store the byte value directly
-			bn.Length++
-			if decimalPointSeen {
-				bn.Scale++
-			}
-		}
-	}
 }
 
 
@@ -42,13 +25,14 @@ func (bn *DecimalNumber) Add(b DecimalNumber) DecimalNumber {
 	}
 
 	carry := byte(0)
+	lengthInt := int(bn.Length)
 	for i := 5; i >= 0; i-- {
 		sum := carry
-		if i >= 6-bn.Length {
-			sum += bn.Digits[i-(6-bn.Length)]
+		if i >= 6-lengthInt {
+			sum += bn.Digits[i-(6-lengthInt)]
 		}
-		if i >= 6-b.Length {
-			sum += b.Digits[i-(6-b.Length)]
+		if i >= 6-lengthInt {
+			sum += b.Digits[i-(6-lengthInt)]
 		}
 		result.Digits[i] = sum % 10
 		carry = sum / 10
@@ -89,26 +73,4 @@ func (bn *DecimalNumber) Compare(b DecimalNumber) int {
 	}
 
 	return 0
-}
-
-func (bn *DecimalNumber) String() string {
-	if bn.Length == 0 {
-		return "0"
-	}
-
-	result := make([]byte, 0, 8) // max 6 digits + sign + decimal point
-
-	if bn.Sign == 255 {
-		result = append(result, '-')
-	}
-
-	integerPart := int(bn.Length) - int(bn.Scale)
-	for i := 0; i < int(bn.Length); i++ {
-		if i == integerPart && bn.Scale > 0 {
-			result = append(result, '.')
-		}
-		result = append(result, bn.Digits[6-bn.Length+i]+'0')
-	}
-
-	return *(*string)(unsafe.Pointer(&result))
 }
